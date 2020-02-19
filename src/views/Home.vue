@@ -8,12 +8,12 @@
 
 <script>
 // @ is an alias to /src
-import Playground from "@/components/CanvasPlayground.vue";
+import Playground from "@/components/DownStairs/CanvasPlayground.vue";
 
 export default {
   name: "home",
   components: {
-    Playground,
+    Playground
   }
 };
 </script>
