@@ -42,27 +42,27 @@ import Modal from "@/components/Modal/Modal.vue";
 
 const stairTypes = [
 	{
-		src: `background: url(${require("@/assets/stairsImg/blade.png")})`,
+		src: 'background: url(https://imgur.com/O3r8eqB.png})',
 		type: "尖刺階梯",
 		descript: "傷害，血量 - 1"
 	},
 	{
-		src: `background: url(${require("@/assets/stairsImg/jump.png")})`,
+		src: `background: url(https://imgur.com/D3edaEP.png)`,
 		type: "彈跳階梯",
 		descript: "向上彈跳",
 	},
 	{
-		src: `background: url(${require("@/assets/stairsImg/normal.png")})`,
+		src: `background: url(https://imgur.com/EFbSNit.png)`,
 		type: "彈跳階梯",
 		descript: "補血，血量 + 1",
 	},
 	{
-		src: `background: url(${require("@/assets/stairsImg/slide.png")})`,
+		src: `background: url(https://imgur.com/BCszJnB.png)`,
 		type: "滑動階梯",
 		descript: "輸送帶，向左/向右滑動",
 	},
 	{
-		src: `background: url(${require("@/assets/stairsImg/sand.png")})`,
+		src: `background: url(https://imgur.com/2vCGpRh.png)`,
 		type: "流沙階梯",
 		descript: "會緩慢穿過掉下",
 	},

@@ -198,7 +198,6 @@ class Canvas {
 export default {
   data() {
     return {
-      canvas: null,
       isHidden: false,
       toggleGame: () => {
         if (this.isHidden) {

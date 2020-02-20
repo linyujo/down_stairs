@@ -140,7 +140,7 @@ export default class Game {
       initStairs.push(
         new Stair({
           position: new Vec2D(
-            Math.random() * (this.width - 150),
+            Math.random() * (this.width - 150) + 75, // 讓階梯集中中央
             i * stairInterval + 100 // 階梯高度依據index分佈
           ),
           type: easyStairs[parseInt(Math.random() * easyStairs.length)],
@@ -180,7 +180,7 @@ export default class Game {
       this.stairs = [
         ...stairs,
         new Stair({
-          position: new Vec2D(Math.random() * (width - 150), height),
+          position: new Vec2D(Math.random() * (width - 150) + 75, height), // 讓階梯集中中央
           type: weightedRandom(stairTypes, appearWeights),
           ctx: this.ctx
         })
