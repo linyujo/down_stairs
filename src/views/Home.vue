@@ -36,6 +36,8 @@
 </template>
 
 <script>
+/* eslint-disable */
+
 // @ is an alias to /src
 import Playground from "@/components/DownStairs/CanvasPlayground.vue";
 import Modal from "@/components/Modal/Modal.vue";
