@@ -1,7 +1,7 @@
 
 <template>
 	<div>
-		<canvas ref="playground"></canvas>
+		<canvas ref="playground" class="playground"></canvas>
 		<button
 			v-on:click="toggleGame"
 			:class="['startBtn', isHidden ? 'hidden' : '']"
@@ -59,8 +59,8 @@ import Vec2D from "@/utils/Vector2D";
 import Game from "./Game";
 import PlayerAction from "./PlayerAction";
 
-const canvasWidth = 1024;
-const canvasHeight = 768;
+const canvasWidth = 800;
+const canvasHeight = 600;
 
 function ctxExpansion(ctx) {
 	ctx.drawCircle = function(v, r) {
@@ -107,7 +107,6 @@ class Canvas {
 		// 遊戲
 		this.game = new Game({
 			ctx: this.ctx,
-			canvasMain: this.node,
 			width: this.width,
 			height: this.height
 		});
@@ -282,6 +281,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.playground {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
 .startBtn {
 	position: absolute;
 	top: 50%;

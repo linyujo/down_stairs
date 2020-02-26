@@ -41,7 +41,6 @@
 // @ is an alias to /src
 import Playground from "@/components/DownStairs/CanvasPlayground.vue";
 import Modal from "@/components/Modal/Modal.vue";
-import wsClient from "@/sockets/index";
 
 const stairTypes = [
 	{
@@ -82,14 +81,6 @@ export default {
 			firstTwoItems: stairTypes.slice(0, 2),
 			leftItems: stairTypes.slice(2, 5)
 		};
-	},
-	created() {
-		this.initWebSocket();
-	},
-	methods: {
-		initWebSocket() {
-			// wsClient
-		}
 	}
 };
 </script>
