@@ -8,17 +8,11 @@
 		<canvas ref="runningLeft" id="runningLeftCharactor" style="display:none;"></canvas>
 
 		<div class="login-view_center">
-			<canvas ref="loginAnime"></canvas>
+			<!-- <canvas ref="loginAnime"></canvas> -->
 			<form class="login-form" @submit.prevent="login">
-				<div class="title">
-					<div class="imageBox">
-						<div class="imageBox__ratio">
-							<div class="image" :style="{background: titleImageUrl}" />
-						</div>
-					</div>
-				</div>
+				<h1 class="title">小朋友下樓梯</h1>
 				<input class="login-input" required v-model="username" type="text" placeholder="請輸入暱稱" />
-				<button class="login-btn" type="submit">進入</button>
+				<button class="login-btn" type="submit">ENTER</button>
 			</form>
 		</div>
 	</div>
@@ -155,62 +149,45 @@ export default {
 		}
 	},
 	mounted() {
-		// 動畫本體
-		this.canvas = new Canvas(this.$refs.loginAnime);
-		this.canvas.init();
-
-		// 角色跑步
-		const playerRunning = new PlayerAction({
-			node: this.$refs.running,
-			imgID: "runRightImg",
-			frameCountDelay: 4
-		});
-		playerRunning.init();
-
-		const playerRunningLeft = new PlayerAction({
-			node: this.$refs.runningLeft,
-			imgID: "runLeftImg",
-			frameCountDelay: 4
-		});
-		playerRunningLeft.init();
+		// // 動畫本體
+		// this.canvas = new Canvas(this.$refs.loginAnime);
+		// this.canvas.init();
+		// // 角色跑步
+		// const playerRunning = new PlayerAction({
+		// 	node: this.$refs.running,
+		// 	imgID: "runRightImg",
+		// 	frameCountDelay: 4
+		// });
+		// playerRunning.init();
+		// const playerRunningLeft = new PlayerAction({
+		// 	node: this.$refs.runningLeft,
+		// 	imgID: "runLeftImg",
+		// 	frameCountDelay: 4
+		// });
+		// playerRunningLeft.init();
 	}
 };
 </script>
 
 <style lang="scss" scoped>
 #login-view {
-	height: 100vh;
-	// background: #7dc8d8;
+	height: 100%;
 }
 .login-view_center {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	canvas {
+		border-radius: 20%;
+	}
 }
 
 .title {
-	width: 346px;
-	margin: 0 auto;
-}
-.imageBox {
-	width: 100%;
-	overflow: hidden;
-	.image {
-		/* 定位 */
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		/* 圖片 */
-		background-size: cover;
-		background-position: center;
-	}
-}
-.imageBox__ratio {
-	width: 100%;
-	padding-top: 20%;
+	font-size: 48px;
+	color: rgba(255, 255, 255, 0.3);
+	text-shadow: 0 0 15px rgba(255, 255, 255, 0.5),
+		0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .login-form {
@@ -243,10 +220,26 @@ button {
 	width: 300px;
 	height: 40px;
 	margin: 12px 0 0 0;
+	padding: 6px 24px;
 	font-size: 1rem;
 	text-align: center;
-	border: none;
+	border: 1px solid #54381e;
 	border-radius: 4px;
-	background: #fff076;
+	color: rgba(255, 255, 255, 0.5);
+	font-family: "Press Start 2P";
+	text-decoration: none;
+	text-shadow: 0 0 15px rgba(255, 255, 255, 0.5),
+		0 0 10px rgba(255, 255, 255, 0.5);
+	box-shadow: inset 0px 1px 0px 0px #a6827e;
+	background: linear-gradient(to bottom, #7d5d3b 5%, #634b30 100%);
+	background-color: #7d5d3b;
+	&:hover {
+		background: linear-gradient(to bottom, #634b30 5%, #7d5d3b 100%);
+		background-color: #634b30;
+	}
+	&:active {
+		position: relative;
+		top: 1px;
+	}
 }
 </style>

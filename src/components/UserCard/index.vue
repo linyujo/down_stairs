@@ -1,11 +1,12 @@
 <template>
-	<li class="user-card">
+	<li :class="['user-card', isHovered ? 'hover' : '']">
 		<div class="avatar">
 			<div class="imageBox">
 				<div class="imageBox__ratio">
 					<div class="image" :style="{background: `url(${user.avatar}) `}" />
 				</div>
 			</div>
+			<div class="avatar-mask"></div>
 		</div>
 		<div class="userName">{{user.username}}</div>
 	</li>
@@ -13,7 +14,20 @@
 
 <script>
 export default {
-	props: ["user"]
+	props: ["user"],
+	data() {
+		return {
+			isHovered: false
+		};
+	},
+	methods: {
+		handleMouseOver: function() {
+			this.isHovered = true;
+		},
+		handleMouseOut: function() {
+			this.isHovered = false;
+		}
+	}
 };
 </script>
 
@@ -48,23 +62,38 @@ li {
 .user-card {
 	display: flex;
 	align-items: center;
-	padding: 0 16px;
+	padding: 0 14px;
 	margin-bottom: 8px;
-	@include background;
+	border-radius: 6px;
 	cursor: pointer;
-	box-shadow: 5px 5px 5px -5px #333;
 	transition: 0.3s;
-	// &:hover {
-	// 	box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-	// }
+	&:hover {
+		background: radial-gradient(
+			circle,
+			rgba(255, 255, 255, 1) 0%,
+			rgba(255, 253, 221, 1) 66%
+		);
+		box-shadow: 10px 10px 234px 64px rgba(255, 253, 221, 1);
+		.avatar-mask {
+			background: rgba(0, 0, 0, 0);
+		}
+	}
 }
 .avatar {
 	width: 70px;
+	overflow: hidden;
+	border-radius: 6px;
+	.avatar-mask {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		background: rgba(0, 0, 0, 0.7);
+	}
 }
 .imageBox {
 	width: 100%;
-	overflow: hidden;
-	border-radius: 50%;
 	.image {
 		/* 定位 */
 		position: absolute;
