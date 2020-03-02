@@ -20,32 +20,30 @@
 				</div>
 			</div>
 		</div>
-  </div>
+	</div>
 </template>
 
 <script>
-
-
 export default {
-  name: "Modal",
+	name: "Modal"
 };
 </script>
 
 <style lang="scss" scoped>
-.modal-mask{
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.modal-mask {
+	position: fixed;
+	z-index: 9998;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.2);
+	transition: opacity 0.3s ease;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
-.modal-container{
+.modal-container {
 	background-color: #fefefe;
 	width: 100%;
 	// max-width: 624px;
@@ -54,16 +52,16 @@ export default {
 	margin: 0 auto;
 	position: relative;
 }
-.modal-header{
-	border-bottom: 1px solid rgba(34,36,38,.15);
+.modal-header {
+	border-bottom: 1px solid rgba(34, 36, 38, 0.15);
 	padding: 1rem 1rem;
 	font-weight: bold;
 }
-.modal-body{
+.modal-body {
 	padding: 30px;
 }
 
-.btn{
+.btn {
 	/* Remove First 移除ios input style */
 	appearance: none;
 	position: relative;
@@ -80,30 +78,30 @@ export default {
 	background: transparent;
 }
 
-.closeCross{
- 	width: 55px;
+.closeCross {
+	width: 55px;
 	height: 55px;
 	position: absolute;
 	right: 0;
 	transition: all 0.3s;
-	&:hover{
+	&:hover {
 		transform: rotate(180deg);
 	}
 }
 
-.closeCross span{
-    width: 16px;
-    height: 2px;
-    background-color: #484848;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-	&:first-child{
-		transform: translate(-50%,-50%) rotate(45deg);
+.closeCross span {
+	width: 16px;
+	height: 2px;
+	background-color: #484848;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	&:first-child {
+		transform: translate(-50%, -50%) rotate(45deg);
 	}
-	&:last-child{
-		transform: translate(-50%,-50%) rotate(-45deg);
+	&:last-child {
+		transform: translate(-50%, -50%) rotate(-45deg);
 	}
 }
 </style>

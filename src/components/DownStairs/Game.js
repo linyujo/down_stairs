@@ -136,14 +136,15 @@ export default class Game {
 
 		let initStairs = [];
 		// 先新增6個階梯
-		do_Times(6)(i => {
+		do_Times(5)(i => {
 			initStairs.push(
 				new Stair({
 					position: new Vec2D(
 						Math.random() * (this.width - 150) + 75, // 讓階梯集中中央
 						i * stairInterval + 100 // 階梯高度依據index分佈
 					),
-					type: easyStairs[parseInt(Math.random() * easyStairs.length)],
+					type:
+						easyStairs[parseInt(Math.random() * easyStairs.length)],
 					ctx: ctx
 				})
 			);
@@ -160,7 +161,7 @@ export default class Game {
 		const floor = parseInt(time / 100);
 
 		// 每隔25毫秒，新增一個階梯
-		if (time % 25 === 0) {
+		if (time % 30 === 0) {
 			let appearWeights; // 權重
 			if (floor <= 10) {
 				appearWeights = [25, 15, 15, 20, 20, 5];
@@ -180,7 +181,10 @@ export default class Game {
 			this.stairs = [
 				...stairs,
 				new Stair({
-					position: new Vec2D(Math.random() * (width - 150) + 75, height), // 讓階梯集中中央
+					position: new Vec2D(
+						Math.random() * (width - 150) + 75,
+						height
+					), // 讓階梯集中中央
 					type: weightedRandom(stairTypes, appearWeights),
 					ctx: this.ctx
 				})
@@ -282,13 +286,13 @@ export default class Game {
 				if (isOn) {
 					stairTypeInteraction(stair, player);
 					stairSonud(stair, player);
-					player.currentStair = stair;
+					player.latestStair = stair;
 				}
 			});
 		});
 
 		function stairSonud(stair, player) {
-			if (player.currentStair === stair) {
+			if (player.latestStair === stair) {
 				// 避免同一個階梯，重複播放
 				return;
 			}
@@ -336,13 +340,13 @@ export default class Game {
 					player.position.y -= 3;
 					break;
 				case "blade":
-					if (player.currentStair !== stair) {
+					if (player.latestStair !== stair) {
 						// 如果踩到的階梯 是同一個，不要重複 扣血
 						player.bloodDelta(-1);
 					}
 					break;
 				case "normal":
-					if (player.currentStair !== stair) {
+					if (player.latestStair !== stair) {
 						// 如果踩到的階梯 是同一個，不要重複 補血
 						player.bloodDelta(+1);
 					}

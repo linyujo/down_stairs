@@ -1,13 +1,14 @@
-
 <template>
-	<div>
+	<div class="game">
 		<canvas ref="playground" class="playground"></canvas>
 		<button
 			v-on:click="toggleGame"
 			:class="['startBtn', isHidden ? 'hidden' : '']"
 			ref="startButton"
 			id="startButton"
-		>Start</button>
+		>
+			Start
+		</button>
 		<!-- 音訊 -->
 		<audio id="backgroundMusic" loop>
 			<source src="@/assets/audio/backgroundMusic.wav" type="audio/wav" />
@@ -28,27 +29,53 @@
 			<source src="@/assets/audio/step.wav" type="audio/wav" />
 		</audio>
 		<!-- 站立向右 -->
-		<canvas ref="player1StandRight" id="player1StandRight" style="display:none"></canvas>
-		<img id="standRightPlayer1" src="@/assets/player1/standRight.png" style="display:none" />
+		<canvas
+			ref="player1StandRight"
+			id="player1StandRight"
+			style="display:none"
+		></canvas>
 		<!-- 站立向左 -->
-		<canvas ref="player1StandLeft" id="player1StandLeft" style="display:none"></canvas>
-		<img id="standLeftPlayer1" src="@/assets/player1/standLeft.png" style="display:none" />
+		<canvas
+			ref="player1StandLeft"
+			id="player1StandLeft"
+			style="display:none"
+		></canvas>
 		<!-- 跳躍 向右 -->
-		<img id="jumpRightPlayer1" src="@/assets/player1/jumpRight.png" style="display:none" />
+		<img
+			id="jumpRightPlayer1"
+			src="@/assets/player1/jumpRight.png"
+			style="display:none"
+		/>
 		<!-- 跳躍 向左 -->
-		<img id="jumpLeftPlayer1" src="@/assets/player1/jumpLeft.png" style="display:none" />
+		<img
+			id="jumpLeftPlayer1"
+			src="@/assets/player1/jumpLeft.png"
+			style="display:none"
+		/>
 		<!-- 走路向右 -->
-		<canvas ref="player1WalkRight" id="player1WalkRight" style="display:none"></canvas>
-		<img id="walkRightPlayer1" src="@/assets/player1/walkRight.png" style="display:none" />
+		<canvas
+			ref="player1WalkRight"
+			id="player1WalkRight"
+			style="display:none"
+		></canvas>
 		<!-- 走路向左 -->
-		<canvas ref="player1WalkLeft" id="player1WalkLeft" style="display:none"></canvas>
-		<img id="walkLeftPlayer1" src="@/assets/player1/walkLeft.png" style="display:none" />
+		<canvas
+			ref="player1WalkLeft"
+			id="player1WalkLeft"
+			style="display:none"
+		></canvas>
 		<!-- 受傷向右 -->
-		<canvas ref="player1HurtedRight" id="player1HurtedRight" style="display:none"></canvas>
-		<img id="hurtedRightPlayer1" src="@/assets/player1/hurtedRight.png" style="display:none" />
+		<canvas
+			ref="player1HurtedRight"
+			id="player1HurtedRight"
+			style="display:none"
+		></canvas>
 		<!-- 受傷向左 -->
-		<canvas ref="player1HurtedLeft" id="player1HurtedLeft" style="display:none"></canvas>
-		<img id="hurtedLeftPlayer1" src="@/assets/player1/hurtedLeft.png" style="display:none" />
+		<canvas
+			ref="player1HurtedLeft"
+			id="player1HurtedLeft"
+			style="display:none"
+		></canvas>
 	</div>
 </template>
 
@@ -217,21 +244,21 @@ export default {
 		// PlayerOne 站立 向右
 		const playerOneStandRight = new PlayerAction({
 			node: this.$refs.player1StandRight,
-			imgID: "standRightPlayer1"
+			imgSrc: require("@/assets/player1/standRight.png")
 		});
 		playerOneStandRight.init();
 
 		// PlayerOne 站立 向左
 		const playerOneStandLeft = new PlayerAction({
 			node: this.$refs.player1StandLeft,
-			imgID: "standLeftPlayer1"
+			imgSrc: require("@/assets/player1/standLeft.png")
 		});
 		playerOneStandLeft.init();
 
 		// PlayerOne 走路 向右
 		const playerOneWalkRight = new PlayerAction({
 			node: this.$refs.player1WalkRight,
-			imgID: "walkRightPlayer1",
+			imgSrc: require("@/assets/player1/walkRight.png"),
 			frameCountDelay: 4
 		});
 		playerOneWalkRight.init();
@@ -239,7 +266,7 @@ export default {
 		// PlayerOne 走路 向左
 		const playerOneWalkLeft = new PlayerAction({
 			node: this.$refs.player1WalkLeft,
-			imgID: "walkLeftPlayer1",
+			imgSrc: require("@/assets/player1/walkLeft.png"),
 			frameCountDelay: 4
 		});
 		playerOneWalkLeft.init();
@@ -247,7 +274,7 @@ export default {
 		// PlayerOne 受傷 向右
 		const playerOneHurtedRight = new PlayerAction({
 			node: this.$refs.player1HurtedRight,
-			imgID: "hurtedRightPlayer1",
+			imgSrc: require("@/assets/player1/hurtedRight.png"),
 			frameCountDelay: 4,
 			isInfinite: false
 		});
@@ -256,7 +283,7 @@ export default {
 		// PlayerOne 受傷 向左
 		const playerOneHurtedLeft = new PlayerAction({
 			node: this.$refs.player1HurtedLeft,
-			imgID: "hurtedLeftPlayer1",
+			imgSrc: require("@/assets/player1/hurtedLeft.png"),
 			frameCountDelay: 4,
 			isInfinite: false
 		});
@@ -281,6 +308,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.game{
+	height: 100%;
+}
 .playground {
 	position: absolute;
 	top: 50%;
@@ -295,6 +325,7 @@ export default {
 	padding: 10px 70px;
 	background: rgba(white, 0.2);
 	color: white;
+	font-family: "Press Start 2P";
 	font-size: 50px;
 	border-radius: 500px;
 	border: none;

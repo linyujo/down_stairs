@@ -3,12 +3,15 @@
 		<div class="avatar">
 			<div class="imageBox">
 				<div class="imageBox__ratio">
-					<div class="image" :style="{background: `url(${user.avatar}) `}" />
+					<div
+						class="image"
+						:style="{ background: `url(${user.avatar}) ` }"
+					/>
 				</div>
 			</div>
 			<div class="avatar-mask"></div>
 		</div>
-		<div class="userName">{{user.username}}</div>
+		<div class="userName">{{ user.username }}</div>
 	</li>
 </template>
 

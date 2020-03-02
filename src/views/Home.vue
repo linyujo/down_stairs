@@ -1,14 +1,20 @@
 <template>
-	<div class="home">
-		<!-- <img alt="Vue logo" src="../assets/logo.png" /> -->
-		<!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
+	<div class="home-view">
+		<div class="home-bg"></div>
+		<nav id="nav">
+			<router-link to="/">單機</router-link>
+			<router-link to="/dual">連線</router-link>
+		</nav>
 		<Playground />
 		<Modal v-if="showModal" @close="showModal = false">
 			<div slot="customHeader">階梯說明</div>
 			<div slot="customBody">
 				<div class="container">
 					<div class="row">
-						<li v-for="(stair, index) in firstTwoItems" v-bind:key="index">
+						<li
+							v-for="(stair, index) in firstTwoItems"
+							v-bind:key="index"
+						>
 							<div class="imageBox">
 								<div class="imageBox__ratio">
 									<div class="image" :style="stair.src" />
@@ -19,7 +25,10 @@
 						</li>
 					</div>
 					<div class="row">
-						<li v-for="(stair, index) in leftItems" v-bind:key="index">
+						<li
+							v-for="(stair, index) in leftItems"
+							v-bind:key="index"
+						>
 							<div class="imageBox">
 								<div class="imageBox__ratio">
 									<div class="image" :style="stair.src" />
@@ -36,8 +45,6 @@
 </template>
 
 <script>
-/* eslint-disable */
-
 // @ is an alias to /src
 import Playground from "@/components/DownStairs/CanvasPlayground.vue";
 import Modal from "@/components/Modal/Modal.vue";
@@ -49,22 +56,22 @@ const stairTypes = [
 		descript: "傷害，血量 - 1"
 	},
 	{
-		src: `background: url(https://imgur.com/D3edaEP.png)`,
+		src: "background: url(https://imgur.com/D3edaEP.png)",
 		type: "彈跳階梯",
 		descript: "向上彈跳"
 	},
 	{
-		src: `background: url(https://imgur.com/EFbSNit.png)`,
+		src: "background: url(https://imgur.com/EFbSNit.png)",
 		type: "彈跳階梯",
 		descript: "補血，血量 + 1"
 	},
 	{
-		src: `background: url(https://imgur.com/BCszJnB.png)`,
+		src: "background: url(https://imgur.com/BCszJnB.png)",
 		type: "滑動階梯",
 		descript: "輸送帶，向左/向右滑動"
 	},
 	{
-		src: `background: url(https://imgur.com/2vCGpRh.png)`,
+		src: "background: url(https://imgur.com/2vCGpRh.png)",
 		type: "流沙階梯",
 		descript: "會緩慢穿過掉下"
 	}
@@ -77,7 +84,7 @@ export default {
 	},
 	data() {
 		return {
-			showModal: true,
+			showModal: false,
 			firstTwoItems: stairTypes.slice(0, 2),
 			leftItems: stairTypes.slice(2, 5)
 		};
@@ -86,6 +93,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.home-view {
+	height: 100%;
+}
+.home-bg {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		rgba(0, 0, 0, 1) 0%,
+		rgba(83, 83, 83, 1) 80%,
+		rgba(171, 171, 171, 1) 100%
+	);
+}
 .container {
 	width: 800px;
 	.row {
@@ -124,5 +147,34 @@ li {
 	/* 圖片 */
 	background-size: cover;
 	background-position: center;
+}
+#nav {
+	position: absolute;
+	top: 10%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 1;
+	cursor: pointer;
+	a {
+		font-weight: bold;
+		text-decoration: none;
+		color: white;
+		&:first-child {
+			&::after {
+				content: "";
+				display: inline-block;
+				background: white;
+				width: 2px;
+				height: 16px;
+				margin-left: 10px;
+				margin-right: 10px;
+				vertical-align: middle;
+			}
+		}
+		&.router-link-exact-active {
+			color: #4aff4a;
+			text-decoration: underline;
+		}
+	}
 }
 </style>

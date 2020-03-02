@@ -1,17 +1,32 @@
 <template>
 	<div id="login-view">
-		<!-- 跑步向右 -->
-		<img id="runRightImg" src="@/assets/loginRunning.png" style="display:none" />
-		<canvas ref="running" id="runningCharactor" style="display:none;"></canvas>
-		<!-- 跑步向左 -->
-		<img id="runLeftImg" src="@/assets/loginRunningLeft.png" style="display:none" />
-		<canvas ref="runningLeft" id="runningLeftCharactor" style="display:none;"></canvas>
-
+		<div class="bg">
+			<div class="bg__wave5">
+				<div class="inner"></div>
+			</div>
+			<div class="bg__wave4">
+				<div class="inner"></div>
+			</div>
+			<div class="bg__wave3">
+				<div class="inner"></div>
+			</div>
+			<div class="bg__wave2">
+				<div class="inner"></div>
+			</div>
+			<div class="bg__wave1">
+				<div class="inner"></div>
+			</div>
+		</div>
 		<div class="login-view_center">
-			<!-- <canvas ref="loginAnime"></canvas> -->
 			<form class="login-form" @submit.prevent="login">
 				<h1 class="title">小朋友下樓梯</h1>
-				<input class="login-input" required v-model="username" type="text" placeholder="請輸入暱稱" />
+				<input
+					class="login-input"
+					required
+					v-model="username"
+					type="text"
+					placeholder="請輸入暱稱"
+				/>
 				<button class="login-btn" type="submit">ENTER</button>
 			</form>
 		</div>
@@ -19,152 +34,41 @@
 </template>
 
 <script>
-/* eslint-disable */
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 
-import Vec2D from "@/utils/Vector2D";
-import user from "@/store/modules/user";
-import Animation from "@/components/LoginAnimation/Animation";
-import PlayerAction from "@/components/DownStairs/PlayerAction";
-
-const userActionTypes = user.actionTypes;
-
-function ctxExpansion(ctx) {
-	ctx.drawCircle = function(v, r) {
-		this.arc(v.x, v.y, r, 0, Math.PI * 2);
-	};
-	ctx.drawLine = function(v1, v2) {
-		this.moveTo(v1.x, v1.y);
-		this.lineTo(v2.x, v2.y);
-	};
-}
-
-class Canvas {
-	node;
-	width = 0;
-	height = 0;
-	ctx;
-	animation;
-	mouse = {
-		position: new Vec2D(0, 0),
-		posDown: new Vec2D(0, 0),
-		posUp: new Vec2D(0, 0)
-	};
-	constructor(node) {
-		this.node = node;
-	}
-	init = () => {
-		if (!this.node) {
-			throw new Error("canvas is not created");
-		}
-		this.ctx = this.node.getContext("2d");
-		this.width = this.node.width = 560;
-		this.height = this.node.height = 440;
-		ctxExpansion(this.ctx);
-
-		this.node.addEventListener("mousemove", this.handleMouseMove);
-
-		// 動畫
-		this.animation = new Animation({
-			ctx: this.ctx,
-			width: this.width,
-			height: this.height
-		});
-		this.animation.init();
-
-		requestAnimationFrame(this.render);
-		setInterval(this.update, 1000 / 30);
-	};
-	update = () => {
-		// 遊戲
-		this.animation.update();
-	};
-	render = () => {
-		// 清空
-		this.ctx.clearRect(0, 0, this.width, this.height);
-
-		// 遊戲
-		this.animation.render();
-		// 滑鼠游標
-		// this.cursor();
-
-		requestAnimationFrame(this.render);
-	};
-	cursor = () => {
-		const { position } = this.mouse;
-		this.ctx.fillStyle = "red";
-		this.ctx.beginPath();
-		this.ctx.drawCircle(position, 3);
-		this.ctx.fill();
-
-		this.ctx.save();
-		this.ctx.beginPath();
-
-		this.ctx.translate(position.x, position.y);
-		this.ctx.strokeStyle = "red";
-
-		this.ctx.fillText(position, 10, -10); // 靶心座標文字
-		const bullLength = 20; // 靶心長度
-		// 靶心X軸
-		this.ctx.drawLine(new Vec2D(-bullLength, 0), new Vec2D(bullLength, 0));
-		// 旋轉90, 靶心Y軸
-		this.ctx.rotate(Math.PI / 2);
-		this.ctx.drawLine(new Vec2D(-bullLength, 0), new Vec2D(bullLength, 0));
-		this.ctx.stroke();
-
-		this.ctx.restore();
-	};
-	handleMouseMove = evt => {
-		this.mouse.position.set(evt.offsetX, evt.offsetY);
-	};
-}
+import User from "@/store/modules/user";
+import socket from "@/socket";
 
 export default {
 	data() {
 		return {
-			username: "",
-			titleImageUrl: `url(${require("@/assets/down_stair_title.png")})`
+			username: ""
 		};
 	},
-	computed: mapState(["user"]),
+	computed: {
+		...mapGetters(["authStatus"])
+	},
 	watch: {
-		user: {
-			handler: function(updatedUser, prevUser) {
-				if (updatedUser.status === "login") {
+		authStatus: {
+			handler: function(updatedStatus) {
+				if (updatedStatus === "login") {
 					this.$router.push("/");
 				}
-			},
-			deep: true
+			}
 		}
 	},
 	methods: {
 		login: function() {
 			const { username } = this;
 			const payload = {
-				type: "username",
 				username: username
 			};
 
-			this.$store.dispatch(userActionTypes.AUTH_REQUEST, payload);
+			socket.emit("REQUEST_USER_TOKEN", payload);
+			socket.on("RESPONSE_USER_TOKEN", token => {
+				this.$store.dispatch(User.actionTypes.AUTH_SUCCESS, token);
+			});
 		}
-	},
-	mounted() {
-		// // 動畫本體
-		// this.canvas = new Canvas(this.$refs.loginAnime);
-		// this.canvas.init();
-		// // 角色跑步
-		// const playerRunning = new PlayerAction({
-		// 	node: this.$refs.running,
-		// 	imgID: "runRightImg",
-		// 	frameCountDelay: 4
-		// });
-		// playerRunning.init();
-		// const playerRunningLeft = new PlayerAction({
-		// 	node: this.$refs.runningLeft,
-		// 	imgID: "runLeftImg",
-		// 	frameCountDelay: 4
-		// });
-		// playerRunningLeft.init();
 	}
 };
 </script>
@@ -173,6 +77,110 @@ export default {
 #login-view {
 	height: 100%;
 }
+
+@keyframes wave {
+	0% {
+		transform: rotateZ(0deg);
+	}
+	50% {
+		transform: translateY(-2%) rotateZ(180deg);
+	}
+	100% {
+		transform: rotateZ(360deg);
+	}
+}
+
+.bg {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(39, 39, 39, 0.8);
+	.bg__wave1 {
+		width: 40%;
+		height: 40vw;
+		position: absolute;
+		top: 50%;
+		left: 40%;
+		transform: translate(-50%, -50%);
+		.inner {
+			width: 100%;
+			height: 100%;
+			background-color: rgb(0, 0, 0);
+			border-radius: 45%;
+			animation: wave 10s infinite linear;
+			box-shadow: 25px 6px 141px 140px rgba(28, 31, 36, 1);
+		}
+	}
+	.bg__wave2 {
+		width: 46%;
+		height: 46vw;
+		position: absolute;
+		top: 50%;
+		left: 40%;
+		transform: translate(-50%, -50%);
+		.inner {
+			width: 100%;
+			height: 100%;
+			background-color: rgb(0, 0, 0);
+			opacity: 0.5;
+			border-radius: 47%;
+			animation: wave 10s infinite linear;
+		}
+	}
+	.bg__wave3 {
+		width: 60%;
+		height: 60vw;
+		position: absolute;
+		top: 50%;
+		left: 40%;
+		transform: translate(-50%, -50%);
+		.inner {
+			width: 100%;
+			height: 100%;
+			border-radius: 45%;
+			background-color: rgb(46, 46, 46);
+			opacity: 0.5;
+			animation: wave 10s infinite linear;
+			box-shadow: 36px 6px 107px -9px rgb(58, 58, 58);
+		}
+	}
+	.bg__wave4 {
+		width: 80%;
+		height: 80vw;
+		position: absolute;
+		top: 50%;
+		left: 40%;
+		transform: translate(-50%, -50%);
+		.inner {
+			width: 100%;
+			height: 100%;
+			border-radius: 47%;
+			background-color: rgb(59, 59, 59);
+			opacity: 0.7;
+			animation: wave 10s infinite linear;
+			animation-delay: 2s;
+		}
+	}
+	.bg__wave5 {
+		width: 90%;
+		height: 90vw;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		.inner {
+			width: 100%;
+			height: 100%;
+			border-radius: 45%;
+			background-color: rgb(70, 69, 69);
+			opacity: 0.6;
+			box-shadow: 36px 6px 107px -9px rgb(58, 58, 58);
+		}
+	}
+}
+
 .login-view_center {
 	position: absolute;
 	top: 50%;
@@ -188,10 +196,6 @@ export default {
 	color: rgba(255, 255, 255, 0.3);
 	text-shadow: 0 0 15px rgba(255, 255, 255, 0.5),
 		0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-.login-form {
-	//top: 50vh;
 }
 
 input {
