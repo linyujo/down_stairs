@@ -11,22 +11,22 @@
 		</button>
 		<!-- 音訊 -->
 		<audio id="backgroundMusic" loop>
-			<source src="@/assets/audio/backgroundMusic.wav" type="audio/wav" />
+			<source src="@/assets/audio/bgMusic.mp3" type="audio/mp3" />
 		</audio>
 		<audio id="transmitSound">
 			<source src="@/assets/audio/transmit.mp3" type="audio/mp3" />
 		</audio>
 		<audio id="stabSound">
-			<source src="@/assets/audio/stab.wav" type="audio/wav" />
+			<source src="@/assets/audio/stab.mp3" type="audio/mp3" />
 		</audio>
 		<audio id="gameOverSound">
-			<source src="@/assets/audio/gameOver.wav" type="audio/wav" />
+			<source src="@/assets/audio/gameOver.mp3" type="audio/mp3" />
 		</audio>
 		<audio id="bounceSound">
 			<source src="@/assets/audio/bounce.mp3" type="audio/mp3" />
 		</audio>
 		<audio id="stepSound">
-			<source src="@/assets/audio/step.wav" type="audio/wav" />
+			<source src="@/assets/audio/step.mp3" type="audio/mp3" />
 		</audio>
 		<!-- 站立向右 -->
 		<canvas
