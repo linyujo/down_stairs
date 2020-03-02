@@ -149,10 +149,7 @@ li {
 	background-position: center;
 }
 #nav {
-	position: absolute;
-	top: 10%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	top: 30px;
 	z-index: 1;
 	cursor: pointer;
 	a {
