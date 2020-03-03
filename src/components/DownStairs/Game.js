@@ -7,7 +7,6 @@ import {
 	stopSound,
 	weightedRandom
 } from "@/utils/utilFuncs";
-import TweenMax from "gsap/TweenMax";
 
 function isPlayerOnAStair(stair, player) {
 	/*
@@ -73,7 +72,7 @@ export default class Game {
 	};
 	init = () => {
 		// 音樂
-		playSound("backgroundMusic", 0.3);
+		playSound("backgroundMusic", 0.8);
 		// 玩家
 		this.createPlayers();
 		// 樓梯
@@ -307,11 +306,11 @@ export default class Game {
 					// 受傷音效在扣血時播放
 					break;
 				case "slideLeft":
-					playSound("transmitSound");
+					playSound("transmitSound", 0.5);
 					// playSound_Times('transmitSound', 3);
 					break;
 				case "slideRight":
-					playSound("transmitSound");
+					playSound("transmitSound", 0.5);
 					// playSound_Times('transmitSound', 3);
 					break;
 				default:
@@ -328,6 +327,7 @@ export default class Game {
 				case "jump":
 					player.v.y = -10;
 					stair.extraHeight = 10;
+					// eslint-disable-next-line no-undef
 					TweenMax.to(stair, 0.2, { extraHeight: 0 }); // 彈簧效果
 					break;
 				case "slideLeft":
