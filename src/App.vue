@@ -113,16 +113,4 @@ export default {
 		margin-bottom: 40px;
 	}
 }
-
-#nav {
-	padding: 10px;
-	a {
-		font-weight: bold;
-		color: #2c3e50;
-
-		&.router-link-exact-active {
-			color: #42b983;
-		}
-	}
-}
 </style>

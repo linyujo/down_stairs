@@ -1,11 +1,42 @@
 <template>
 	<div class="home-view">
 		<div class="home-bg"></div>
-		<nav id="nav">
-			<router-link to="/">單機</router-link>
-			<router-link to="/dual">連線</router-link>
-		</nav>
-		<Playground />
+		<div id="nav">
+			<ul>
+				<li title="single">
+					<input
+						type="radio"
+						value="single"
+						id="nav_tab1"
+						name="gameType"
+						class="check-with-label"
+						@change="changeMode('singleMode')"
+					/>
+					<label for="nav_tab1" role="button" class="label-for-check">
+						<span>單人</span>
+					</label>
+				</li>
+				<li title="dual">
+					<input
+						type="radio"
+						value="dual"
+						id="nav_tab2"
+						class="check-with-label"
+						name="gameType"
+						@change="changeMode('dualMode')"
+					/>
+					<label for="nav_tab2" role="button" class="label-for-check">
+						<span>雙人</span>
+					</label>
+				</li>
+			</ul>
+			<div :class="['slider', mode]">
+				<div class="indicator"></div>
+			</div>
+		</div>
+		<component :is="mode"></component>
+		<!-- <SingleMode v-if="(gameType = 'single')" />
+		<div v-else>AAA</div> -->
 		<Modal v-if="showModal" @close="showModal = false">
 			<div slot="customHeader">階梯說明</div>
 			<div slot="customBody">
@@ -45,8 +76,9 @@
 </template>
 
 <script>
+/* eslint-disable */
 // @ is an alias to /src
-import Playground from "@/components/DownStairs/CanvasPlayground.vue";
+import SingleMode from "@/components/DownStairs/CanvasPlayground.vue";
 import Modal from "@/components/Modal/Modal.vue";
 
 const stairTypes = [
@@ -79,16 +111,25 @@ const stairTypes = [
 
 export default {
 	components: {
-		Playground,
-		Modal
+		singleMode: SingleMode,
+		dualMode: {
+			template: '<p>This is DualMode.<p>',
+		},
+		Modal,
 	},
 	data() {
 		return {
 			showModal: false,
+			mode: "singleMode",
 			firstTwoItems: stairTypes.slice(0, 2),
 			leftItems: stairTypes.slice(2, 5)
 		};
-	}
+	},
+	methods: {
+		changeMode(mode) {
+			this.mode = mode;
+		},
+	},
 };
 </script>
 
@@ -120,14 +161,14 @@ export default {
 	}
 }
 
-li {
-	display: inline-block;
-	list-style: none;
-	.title {
-		margin: 8px 0 4px 0;
-		font-weight: bold;
-	}
-}
+// li {
+// 	display: inline-block;
+// 	list-style: none;
+// 	.title {
+// 		margin: 8px 0 4px 0;
+// 		font-weight: bold;
+// 	}
+// }
 .imageBox {
 	width: 228px;
 	overflow: hidden;
@@ -149,28 +190,55 @@ li {
 	background-position: center;
 }
 #nav {
-	top: 30px;
-	z-index: 1;
-	cursor: pointer;
-	a {
-		font-weight: bold;
-		text-decoration: none;
-		color: white;
-		&:first-child {
-			&::after {
-				content: "";
-				display: inline-block;
-				background: white;
-				width: 2px;
-				height: 16px;
-				margin-left: 10px;
-				margin-right: 10px;
-				vertical-align: middle;
-			}
+	width: 200px;
+	margin: 0 auto;
+	ul{
+		list-style-type: none;
+		display: flex;
+		justify-content: center;
+		padding-left: 0;
+		margin-bottom: 0;
+		li{
+			padding: 10px;
 		}
-		&.router-link-exact-active {
-			color: #4aff4a;
-			text-decoration: underline;
+	}
+	input[name="gameType"] {
+		display: none;
+	}
+	.label-for-check {
+		width: 100px;
+		padding: 10px;
+		text-align: center;
+		color: grey;
+		padding: 5px auto;
+		cursor: pointer;
+		transition: all 0.2s ease-in-out;
+		&:hover{
+			color: white;
+		}
+	}
+	.check-with-label:checked + .label-for-check {
+		color: #31B404;
+		font-weight: bold;
+	}
+}
+.slider{
+	width: 100%;
+	.indicator {
+      	height: 4px;
+		width: 50px;
+		background: #31B404;
+		border-radius: 1px;
+		transition: all 0.3s ease-in-out;
+    }
+	&.singleMode{
+		.indicator{
+			transform: translateX(75%);
+		}
+	}
+	&.dualMode{
+		.indicator{
+			transform: translateX(220%);
 		}
 	}
 }
