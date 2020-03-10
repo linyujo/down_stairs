@@ -3,44 +3,23 @@
 		<div class="home-bg"></div>
 		<div id="nav">
 			<ul>
-				<li title="single">
-					<input
-						type="radio"
-						value="single"
-						id="tab_single"
-						name="gameMode"
-						class="check-with-label"
-						@change="changeMode"
-						:checked="gameMode === 'single'"
-					/>
-					<label
-						for="tab_single"
-						role="button"
-						class="label-for-check"
-					>
-						<span>單人</span>
-					</label>
+				<li title="single" @mouseover="handleMouseOver('single')">
+					<router-link to="/single">
+						<img :src="singleIcon" alt="單人" />
+						<div class="link-desc">單人</div>
+					</router-link>
 				</li>
-				<li title="dual">
-					<input
-						type="radio"
-						value="dual"
-						id="tab_dual"
-						name="gameMode"
-						class="check-with-label"
-						@change="changeMode"
-						:checked="gameMode === 'dual'"
-					/>
-					<label for="tab_dual" role="button" class="label-for-check">
-						<span>雙人</span>
-					</label>
+				<li title="dual" @mouseover="handleMouseOver('dual')">
+					<router-link to="/dual">
+						<img :src="dualIcon" alt="雙人" />
+						<div class="link-desc">雙人</div>
+					</router-link>
 				</li>
 			</ul>
-			<div :class="['slider', gameMode]">
+			<div :class="['slider', hoveredLink]">
 				<div class="indicator"></div>
 			</div>
 		</div>
-		<component :is="gameMode"></component>
 		<Modal v-if="showModal" @close="showModal = false">
 			<div slot="customHeader">階梯說明</div>
 			<div slot="customBody">
@@ -84,8 +63,6 @@
 // @ is an alias to /src
 import { mapGetters } from "vuex";
 
-import SingleMode from "@/components/DownStairs/Single.vue";
-import DualMode from "@/components/DownStairs/Dual.vue"
 import Modal from "@/components/Modal/Modal.vue";
 import game from "@/store/modules/gameMode";
 
@@ -119,33 +96,22 @@ const stairTypes = [
 
 export default {
 	components: {
-		single: SingleMode,
-		dual: DualMode,
 		Modal,
-	},
-	computed: {
-		...mapGetters(["gameMode"])
-	},
-	watch: {
-		// gameMode: function(value){
-		// 	if (value === "dual") {
-		// 		this.$refs.tab_dual.click();
-		// 	} else {
-		// 		this.$refs.tab_single.click();
-		// 	}
-		// }
 	},
 	data() {
 		return {
+			singleIcon: require("@/assets/home/single.png"),
+			dualIcon: require("@/assets/home/dual.png"),
+			hoveredLink: 'single',
 			showModal: false,
 			firstTwoItems: stairTypes.slice(0, 2),
 			leftItems: stairTypes.slice(2, 5)
 		};
 	},
 	methods: {
-		changeMode() {
-			this.$store.dispatch(game.actionTypes.UPDATE_GAME_MODE);
-		},
+		handleMouseOver(hovered) {
+			this.hoveredLink = hovered;
+		}
 	},
 };
 </script>
@@ -161,12 +127,6 @@ export default {
 	width: 100%;
 	height: 100%;
 	background: #272727;
-	// background: linear-gradient(
-	// 	90deg,
-	// 	rgba(0, 0, 0, 1) 0%,
-	// 	rgba(83, 83, 83, 1) 80%,
-	// 	rgba(171, 171, 171, 1) 100%
-	// );
 }
 .container {
 	width: 800px;
@@ -208,11 +168,11 @@ export default {
 	background-position: center;
 }
 #nav {
-	width: 200px;
 	margin: 0 auto;
 	position: absolute;
+	top: 40%;
 	left: 50%;
-	transform: translateX(-50%);
+	transform: translate(-50%, -40%);
 	z-index: 1;
 	ul{
 		list-style-type: none;
@@ -221,46 +181,47 @@ export default {
 		padding-left: 0;
 		margin-bottom: 0;
 		li{
-			padding: 10px;
+			&:nth-child(1){
+				margin-right: 20px;
+			}
+			&:nth-child(2){
+				margin-left: 20px;
+			}
+			.link-desc{
+				color: white;
+				transition: all 0.2s ease-in-out;
+			}
+			&:hover{
+				.link-desc{
+					color: #31B404;
+					font-weight: bold;
+				}	
+			}
+			img{
+				display: block;
+				margin-bottom: 16px;
+			}
 		}
-	}
-	input[name="gameMode"] {
-		display: none;
-	}
-	.label-for-check {
-		width: 100px;
-		padding: 10px;
-		text-align: center;
-		color: grey;
-		padding: 5px auto;
-		cursor: pointer;
-		transition: all 0.2s ease-in-out;
-		&:hover{
-			color: white;
-		}
-	}
-	.check-with-label:checked + .label-for-check {
-		color: #31B404;
-		font-weight: bold;
 	}
 }
 .slider{
 	width: 100%;
+	margin-top: 10px;
 	.indicator {
       	height: 4px;
-		width: 50px;
-		background: #31B404;
+		width: 100px;
+		background: #2a8641;
 		border-radius: 1px;
 		transition: all 0.3s ease-in-out;
     }
 	&.single{
 		.indicator{
-			transform: translateX(75%);
+			transform: translateX(50%);
 		}
 	}
 	&.dual{
 		.indicator{
-			transform: translateX(220%);
+			transform: translateX(290%);
 		}
 	}
 }

@@ -4,10 +4,10 @@
 		想與你<br />
 		來一場激烈的決鬥
 		<div class="btn-gruop">
-			<button @click="challengeAccepted" class="text-btn accept">
+			<button @click.once="challengeAccepted" class="text-btn accept">
 				接受
 			</button>
-			<button @click="decline" class="text-btn decline">拒絕</button>
+			<button @click.once="decline" class="text-btn decline">拒絕</button>
 		</div>
 		<div class="timer-wrapper">
 			<p class="timer" id="timer">{{ count }}</p>
@@ -16,64 +16,60 @@
 </template>
 
 <script>
-/* eslint-disable */
 import socket from "@/socket";
 import sidebar from "@/store/modules/sidebarStatus";
-import gameMode from "@/store/modules/gameMode";
+import user from "@/store/modules/user";
 
 export default {
 	props: ["inviter"],
 	data() {
 		return {
-			count: 30,
+			count: 30
 		};
 	},
-	mounted(){
+	mounted() {
 		this.countDown();
 	},
 	watch: {
-		count: function(value){
+		count: function(value) {
 			if (value === 0) {
 				this.decline();
 			}
-		},
+		}
 	},
 	methods: {
-		challengeAccepted: function(){
+		challengeAccepted: function() {
 			const payload = {
 				inviterID: this.inviter.id
 			};
 			socket.emit("ACCEPT_BATTLE_INVITATION", payload);
-			this.$store.dispatch(gameMode.actionTypes.UPDATE_GAME_MODE);
-			this.$store.dispatch(sidebar.actionTypes.BATTLING);
+			this.$store.dispatch(user.actionTypes.UPDATE_STATUS);
 		},
-		decline: function(){
+		decline: function() {
 			this.$store.dispatch(sidebar.actionTypes.RESET_IDLE);
 		},
-		countDown: function(){
+		countDown: function() {
 			if (this.count > 0) {
 				setTimeout(() => {
-					this.count-=1;
+					this.count -= 1;
 					this.countDown();
 				}, 1000);
 			}
 		}
 	}
-}
+};
 </script>
 
 <style lang="scss">
-.invited{
+.invited {
 	color: white;
-	.username{
+	.username {
 		font-size: 20px;
 		margin: 10px auto;
 		color: gold;
-		text-shadow: 
-			1px 1px 3px #ff0000, 
-			1px 0 5px #0000FF;
+		text-shadow: 1px 1px 3px #ff0000, 1px 0 5px #0000ff;
 	}
-	.text-btn{
+	.text-btn {
 		border: none;
 		background-color: inherit;
 		padding: 8px 10px;
@@ -82,20 +78,20 @@ export default {
 		cursor: pointer;
 		display: inline-block;
 		outline: 0;
-		&.accept{
-			color: #31B404;
+		&.accept {
+			color: #31b404;
 		}
-		&.decline{
+		&.decline {
 			color: white;
 		}
 	}
-	.btn-gruop{
+	.btn-gruop {
 		display: flex;
 		justify-content: space-around;
 		margin-top: 20px;
 	}
-	.timer-wrapper{
-		.timer{
+	.timer-wrapper {
+		.timer {
 			color: white;
 			font-size: 60px;
 			line-height: 90px;

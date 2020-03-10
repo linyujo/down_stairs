@@ -20,65 +20,69 @@
 </template>
 
 <script>
-/* eslint-disable */
 import socket from "@/socket";
-import sidebarStatus from "@/store/modules/sidebarStatus"
+import sidebarStatus from "@/store/modules/sidebarStatus";
+import user from "@/store/modules/user";
 
 export default {
 	props: ["invitee", "setTitle"],
 	data() {
 		return {
 			step: 1,
-			count: 30,
+			count: 30
 		};
 	},
 	watch: {
-		step: function(value){
+		step: function(value) {
 			if (value === 2) {
 				this.countDown();
+				this.onListenReply();
 			}
 		},
-		count: function(value){
+		count: function(value) {
 			if (value === 0) {
 				this.decline();
 			}
-		},
+		}
 	},
 	methods: {
-		sendInvitation: function(){
+		sendInvitation: function() {
 			this.step = 2;
 			const payload = {
 				inviteeID: this.invitee.id
 			};
 			socket.emit("SEND_BATTLE_INVITATION", payload);
 		},
-		decline: function(){
+		onListenReply: function() {
+			socket.on("ACCEPT_BATTLE_INVITATION", () => {
+				this.$store.dispatch(user.actionTypes.UPDATE_STATUS);
+			});
+		},
+		decline: function() {
 			this.$store.dispatch(sidebarStatus.actionTypes.RESET_IDLE);
 		},
-		countDown: function(){
+		countDown: function() {
 			if (this.count > 0) {
 				setTimeout(() => {
-					this.count-=1;
+					this.count -= 1;
 					this.countDown();
 				}, 1000);
 			}
 		}
 	}
-}
+};
 </script>
 
 <style lang="scss">
-.invite{
+.invite {
 	color: white;
-	.username{
+	.username {
 		font-size: 20px;
 		margin: 10px auto;
 		color: gold;
-		text-shadow: 
-			1px 1px 3px #ff0000, 
-			1px 0 5px #0000FF;
+		text-shadow: 1px 1px 3px #ff0000, 1px 0 5px #0000ff;
 	}
-	.text-btn{
+	.text-btn {
 		border: none;
 		background-color: inherit;
 		padding: 8px 10px;
@@ -87,20 +91,20 @@ export default {
 		cursor: pointer;
 		display: inline-block;
 		outline: 0;
-		&.accept{
-			color: #31B404;
+		&.accept {
+			color: #31b404;
 		}
-		&.decline{
+		&.decline {
 			color: white;
 		}
 	}
-	.btn-gruop{
+	.btn-gruop {
 		display: flex;
 		justify-content: space-around;
 		margin-top: 20px;
 	}
-	.timer-wrapper{
-		.timer{
+	.timer-wrapper {
+		.timer {
 			color: white;
 			font-size: 60px;
 			line-height: 90px;

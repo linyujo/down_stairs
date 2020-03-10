@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import socket from "@/socket";
 import Sidebar from "@/components/Sidebar";
 import UserList from "@/store/modules/userList";
@@ -17,6 +18,18 @@ import UserList from "@/store/modules/userList";
 export default {
 	components: {
 		Sidebar: Sidebar
+	},
+	computed: {
+		...mapGetters(["isBattling"])
+	},
+	watch: {
+		isBattling: {
+			handler: function(bool) {
+				if (bool) {
+					this.$router.push("/dual");
+				}
+			}
+		}
 	},
 	mounted() {
 		socket.emit("REQUEST_CURRENT_USERS");
