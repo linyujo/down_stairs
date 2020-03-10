@@ -7,12 +7,17 @@
 					<input
 						type="radio"
 						value="single"
-						id="nav_tab1"
-						name="gameType"
+						id="tab_single"
+						name="gameMode"
 						class="check-with-label"
-						@change="changeMode('singleMode')"
+						@change="changeMode"
+						:checked="gameMode === 'single'"
 					/>
-					<label for="nav_tab1" role="button" class="label-for-check">
+					<label
+						for="tab_single"
+						role="button"
+						class="label-for-check"
+					>
 						<span>單人</span>
 					</label>
 				</li>
@@ -20,23 +25,22 @@
 					<input
 						type="radio"
 						value="dual"
-						id="nav_tab2"
+						id="tab_dual"
+						name="gameMode"
 						class="check-with-label"
-						name="gameType"
-						@change="changeMode('dualMode')"
+						@change="changeMode"
+						:checked="gameMode === 'dual'"
 					/>
-					<label for="nav_tab2" role="button" class="label-for-check">
+					<label for="tab_dual" role="button" class="label-for-check">
 						<span>雙人</span>
 					</label>
 				</li>
 			</ul>
-			<div :class="['slider', mode]">
+			<div :class="['slider', gameMode]">
 				<div class="indicator"></div>
 			</div>
 		</div>
-		<component :is="mode"></component>
-		<!-- <SingleMode v-if="(gameType = 'single')" />
-		<div v-else>AAA</div> -->
+		<component :is="gameMode"></component>
 		<Modal v-if="showModal" @close="showModal = false">
 			<div slot="customHeader">階梯說明</div>
 			<div slot="customBody">
@@ -78,8 +82,12 @@
 <script>
 /* eslint-disable */
 // @ is an alias to /src
-import SingleMode from "@/components/DownStairs/CanvasPlayground.vue";
+import { mapGetters } from "vuex";
+
+import SingleMode from "@/components/DownStairs/Single.vue";
+import DualMode from "@/components/DownStairs/Dual.vue"
 import Modal from "@/components/Modal/Modal.vue";
+import game from "@/store/modules/gameMode";
 
 const stairTypes = [
 	{
@@ -111,23 +119,32 @@ const stairTypes = [
 
 export default {
 	components: {
-		singleMode: SingleMode,
-		dualMode: {
-			template: '<p>This is DualMode.<p>',
-		},
+		single: SingleMode,
+		dual: DualMode,
 		Modal,
+	},
+	computed: {
+		...mapGetters(["gameMode"])
+	},
+	watch: {
+		// gameMode: function(value){
+		// 	if (value === "dual") {
+		// 		this.$refs.tab_dual.click();
+		// 	} else {
+		// 		this.$refs.tab_single.click();
+		// 	}
+		// }
 	},
 	data() {
 		return {
 			showModal: false,
-			mode: "singleMode",
 			firstTwoItems: stairTypes.slice(0, 2),
 			leftItems: stairTypes.slice(2, 5)
 		};
 	},
 	methods: {
-		changeMode(mode) {
-			this.mode = mode;
+		changeMode() {
+			this.$store.dispatch(game.actionTypes.UPDATE_GAME_MODE);
 		},
 	},
 };
@@ -143,12 +160,13 @@ export default {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background: linear-gradient(
-		90deg,
-		rgba(0, 0, 0, 1) 0%,
-		rgba(83, 83, 83, 1) 80%,
-		rgba(171, 171, 171, 1) 100%
-	);
+	background: #272727;
+	// background: linear-gradient(
+	// 	90deg,
+	// 	rgba(0, 0, 0, 1) 0%,
+	// 	rgba(83, 83, 83, 1) 80%,
+	// 	rgba(171, 171, 171, 1) 100%
+	// );
 }
 .container {
 	width: 800px;
@@ -192,6 +210,10 @@ export default {
 #nav {
 	width: 200px;
 	margin: 0 auto;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 1;
 	ul{
 		list-style-type: none;
 		display: flex;
@@ -202,7 +224,7 @@ export default {
 			padding: 10px;
 		}
 	}
-	input[name="gameType"] {
+	input[name="gameMode"] {
 		display: none;
 	}
 	.label-for-check {
@@ -231,12 +253,12 @@ export default {
 		border-radius: 1px;
 		transition: all 0.3s ease-in-out;
     }
-	&.singleMode{
+	&.single{
 		.indicator{
 			transform: translateX(75%);
 		}
 	}
-	&.dualMode{
+	&.dual{
 		.indicator{
 			transform: translateX(220%);
 		}

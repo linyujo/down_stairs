@@ -5,6 +5,7 @@ io.send = function(data) {
 	if (this.readyState == 1) this._original_send_func(data);
 }.bind(io);
 
-const socket = io("https://intense-oasis-92813.herokuapp.com");
+// https://intense-oasis-92813.herokuapp.com
+const socket = io("http://192.168.100.5:4000/");
 
 export default socket;

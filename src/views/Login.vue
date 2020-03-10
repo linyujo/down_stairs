@@ -96,7 +96,7 @@ export default {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background: rgba(39, 39, 39, 0.8);
+	background: rgba(0, 0, 0, 1);
 	.bg__wave1 {
 		width: 40%;
 		height: 40vw;

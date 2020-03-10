@@ -1,30 +1,30 @@
-/* eslint-disable */
-
 const state = {
-	token: '', // 由後端給
-	status: '',
+	token: "", // 由後端給
+	authStatus: "",
+	status: "idle"
 };
 
 const getters = {
 	isAuthenticated: state => !!state.token,
-	authStatus: state => state.status,
+	authStatus: state => state.authStatus,
+	clientID: state => state.token
 };
 
 // constant
 const actionTypes = {
-	AUTH_SUCCESS: 'AUTH_SUCCESS',
-	AUTH_ERROR: 'AUTH_ERROR',
+	AUTH_SUCCESS: "AUTH_SUCCESS",
+	AUTH_ERROR: "AUTH_ERROR"
 };
 
 // reducer
 const mutations = {
-	[actionTypes.AUTH_SUCCESS]: (state, token) => {
-		state.status = 'login';
-		state.token = token;
+	[actionTypes.AUTH_SUCCESS]: (nextState, token) => {
+		nextState.authStatus = "login";
+		nextState.token = token;
 	},
-	[actionTypes.AUTH_ERROR]: (state) => {
-		state.status = 'invalid';
-	},
+	[actionTypes.AUTH_ERROR]: nextState => {
+		nextState.authStatus = "invalid";
+	}
 };
 
 // action middleware
@@ -39,5 +39,5 @@ export default {
 	getters,
 	actionTypes,
 	actions,
-	mutations,
+	mutations
 };

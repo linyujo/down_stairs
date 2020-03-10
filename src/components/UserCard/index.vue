@@ -1,5 +1,8 @@
 <template>
-	<li :class="['user-card', isHovered ? 'hover' : '']">
+	<li
+		:class="['user-card', isHovered ? 'hover' : '']"
+		@click="handleClick(user)"
+	>
 		<div class="avatar">
 			<div class="imageBox">
 				<div class="imageBox__ratio">
@@ -17,7 +20,7 @@
 
 <script>
 export default {
-	props: ["user"],
+	props: ["user", "handleClick"],
 	data() {
 		return {
 			isHovered: false

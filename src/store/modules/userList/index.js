@@ -11,19 +11,23 @@ const getters = {
 const actionTypes = {
 	CURRENT_USERS: "CURRENT_USERS",
 	ADD_ONE_USER: "ADD_ONE_USER",
-	DELETE_ONE_USER: "DELETE_ONE_USER"
+	DELETE_ONE_USER: "DELETE_ONE_USER",
+	UPDATE_ONE_USER: "UPDATE_ONE_USER"
 };
 
 // reducer
 const mutations = {
-	[actionTypes.CURRENT_USERS]: (state, list) => {
-		state.list = list;
+	[actionTypes.CURRENT_USERS]: (nextState, list) => {
+		nextState.list = list;
 	},
-	[actionTypes.ADD_ONE_USER]: (state, user) => {
-		state.list = [...state.list, user];
+	[actionTypes.ADD_ONE_USER]: (nextState, user) => {
+		nextState.list = [...state.list, user];
 	},
-	[actionTypes.DELETE_ONE_USER]: (state, id) => {
-		state.list = state.list.filter(u => u.id !== id);
+	[actionTypes.DELETE_ONE_USER]: (nextState, id) => {
+		nextState.list = state.list.filter(u => u.id !== id);
+	},
+	[actionTypes.UPDATE_ONE_USER]: (nextState, user) => {
+		nextState.list = state.list.map(u => (u.id === user.id ? user : u));
 	}
 };
 
@@ -37,6 +41,9 @@ const actions = {
 	},
 	[actionTypes.DELETE_ONE_USER]: ({ commit }, id) => {
 		commit(actionTypes.DELETE_ONE_USER, id);
+	},
+	[actionTypes.UPDATE_ONE_USER]: ({ commit }, user) => {
+		commit(actionTypes.UPDATE_ONE_USER, user);
 	}
 };
 
