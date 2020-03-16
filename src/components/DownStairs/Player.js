@@ -1,5 +1,6 @@
 import Vec2D from "@/utils/Vector2D";
 import { do_Times, playSound } from "@/utils/utilFuncs";
+import { PlayerOne } from "./MotionCanvas";
 
 export default class Player {
 	constructor(args) {
@@ -10,6 +11,7 @@ export default class Player {
 			v: new Vec2D(0, 0),
 			a: new Vec2D(0, 0.8),
 			playerID: 1, // 幾號角色
+			playerMotion: null, // 角色動作
 			blood: 10, // 目前血量
 			maxBlood: 10, // 總血量
 			latestStair: null, // 目前踩到的階梯(避免踩到 刀山，重複扣血)
@@ -22,7 +24,9 @@ export default class Player {
 		};
 		Object.assign(this, this.config);
 	}
-	init = () => {};
+	init = () => {
+		this.playerMotion = this.playerID === 1 ? PlayerOne : null;
+	};
 	update = () => {
 		// 速度, 加速度 更新
 		this.position = this.position.add(this.v);
@@ -81,9 +85,9 @@ export default class Player {
 		}
 	};
 	hurtedLeft = drawDirection => {
-		const { ctx, width, height } = this;
+		const { ctx, width, height, playerMotion } = this;
 		ctx.drawImage(
-			document.getElementById(`player${this.playerID}HurtedLeft`),
+			playerMotion.hurtLeft,
 			0,
 			0,
 			width,
@@ -95,9 +99,9 @@ export default class Player {
 		);
 	};
 	hurtedRight = drawDirection => {
-		const { ctx, width, height } = this;
+		const { ctx, width, height, playerMotion } = this;
 		ctx.drawImage(
-			document.getElementById(`player${this.playerID}HurtedRight`),
+			playerMotion.hurtRight,
 			0,
 			0,
 			width,
@@ -109,9 +113,9 @@ export default class Player {
 		);
 	};
 	walkRight = drawDirection => {
-		const { ctx, width, height } = this;
+		const { ctx, width, height, playerMotion } = this;
 		ctx.drawImage(
-			document.getElementById(`player${this.playerID}WalkRight`),
+			playerMotion.walkRight,
 			0,
 			0,
 			width,
@@ -123,9 +127,9 @@ export default class Player {
 		);
 	};
 	walkLeft = drawDirection => {
-		const { ctx, width, height } = this;
+		const { ctx, width, height, playerMotion } = this;
 		ctx.drawImage(
-			document.getElementById(`player${this.playerID}WalkLeft`),
+			playerMotion.walkLeft,
 			0,
 			0,
 			width,
@@ -137,9 +141,9 @@ export default class Player {
 		);
 	};
 	jumpRight = drawDirection => {
-		const { ctx, width, height } = this;
+		const { ctx, width, height, playerMotion } = this;
 		ctx.drawImage(
-			document.getElementById(`jumpRightPlayer${this.playerID}`),
+			playerMotion.jumpRight,
 			0,
 			0,
 			width,
@@ -151,9 +155,9 @@ export default class Player {
 		);
 	};
 	jumpLeft = drawDirection => {
-		const { ctx, width, height } = this;
+		const { ctx, width, height, playerMotion } = this;
 		ctx.drawImage(
-			document.getElementById(`jumpLeftPlayer${this.playerID}`),
+			playerMotion.jumpLeft,
 			0,
 			0,
 			width,
@@ -165,10 +169,10 @@ export default class Player {
 		);
 	};
 	standRight = drawDirection => {
-		const { ctx, width, height } = this;
+		const { ctx, width, height, playerMotion } = this;
 
 		ctx.drawImage(
-			document.getElementById(`player${this.playerID}StandRight`),
+			playerMotion.standRight,
 			0,
 			0,
 			width,
@@ -180,10 +184,10 @@ export default class Player {
 		);
 	};
 	standLeft = drawDirection => {
-		const { ctx, width, height } = this;
+		const { ctx, width, height, playerMotion } = this;
 
 		ctx.drawImage(
-			document.getElementById(`player${this.playerID}StandLeft`),
+			playerMotion.standLeft,
 			0,
 			0,
 			width,

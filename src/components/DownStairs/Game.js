@@ -53,7 +53,6 @@ export default class Game {
 			"jump",
 			"fade"
 		];
-		this.hurtMaskOpacity = 0;
 		this.isPlaying = false;
 		this.time = 0;
 		this.keyStatus = {
@@ -61,7 +60,7 @@ export default class Game {
 			right: false,
 			space: false // 暫停
 		};
-		this.game = null;
+		// this.game = null;
 		this.controlledPlayerID = 1;
 		this.ctx = args.ctx;
 	}
@@ -196,13 +195,13 @@ export default class Game {
 		});
 	};
 	createPlayers = () => {
-		this.players = [
-			new Player({
-				position: new Vec2D(this.width / 2, 200),
-				ctx: this.ctx,
-				gameWidth: this.width
-			})
-		];
+		const player = new Player({
+			position: new Vec2D(this.width / 2, 200),
+			ctx: this.ctx,
+			gameWidth: this.width
+		});
+		player.init();
+		this.players = [player];
 	};
 	updatePlayers = () => {
 		const { width, height, controlledPlayerID, keyStatus } = this;
