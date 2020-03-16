@@ -28,8 +28,9 @@ class Canvas {
 	};
 	game = null;
 	initConfigs = { // socket傳來的初始設定
+		roomID: 0,
 		initStairConfigs: [],
-
+		initPlayerConfigs: []
 	};
 	constructor(node) {
 		this.node = node;
@@ -140,10 +141,6 @@ class Canvas {
 			this.game.keyStatus.right = false;
 		}
 	};
-	handleStairConfig = configs => {
-		console.log('handleStairConfig');
-		this.game.initStairConfigs = configs;
-	}
 }
 
 export default {
@@ -154,8 +151,16 @@ export default {
 		// 遊戲本體
 		this.canvas = new Canvas(this.$refs.playground);
 
+		window.addEventListener("keydown", evt => {
+			this.canvas.handleKeyDown(evt);
+		});
+		window.addEventListener("keyup", evt => {
+			this.canvas.handleKeyUp(evt);
+		});
+
 		socket.on("GAME_INIT_DATA", payload => {
 			payload.controlledPlayerID = payload.initPlayerConfigs.find(char => char.master === this.clientID).playerID;
+			// console.log('payload', payload);
 			this.canvas.initConfigs = payload;
 
 			this.canvas.init();
@@ -167,6 +172,18 @@ export default {
 
 		socket.on("NEW_STAIR_CONFIG", payload => {
 			this.canvas.game.addNewStair(payload.newStairConfig);
+		});
+
+		socket.on("UPDATE_RIVAL", payload => {
+			this.canvas.game.players.forEach(player => {
+				let updatedPlayer = player;
+				if (player.playerID === payload.playerID){
+					updatedPlayer.position = payload.position;
+					updatedPlayer.direction = payload.direction;
+					updatedPlayer.isRunning = payload.isRunning;
+				}
+				return updatedPlayer
+			});
 		});
 	}
 };

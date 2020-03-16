@@ -1,6 +1,6 @@
 import Vec2D from "@/utils/Vector2D";
 import { do_Times, playSound } from "@/utils/utilFuncs";
-import { PlayerOne } from "./MotionCanvas";
+import { PlayerOne, PlayerTwo } from "./MotionCanvas";
 
 export default class Player {
 	constructor(args) {
@@ -25,7 +25,7 @@ export default class Player {
 		Object.assign(this, this.config);
 	}
 	init = () => {
-		this.playerMotion = this.playerID === 1 ? PlayerOne : null;
+		this.playerMotion = this.playerID === 1 ? PlayerOne : PlayerTwo;
 	};
 	update = () => {
 		// 速度, 加速度 更新
@@ -199,14 +199,37 @@ export default class Player {
 		);
 	};
 	drawBlood = () => {
-		const { ctx, blood, maxBlood, playerID } = this;
+		const {
+			ctx,
+			blood,
+			maxBlood,
+			gameWidth,
+			playerID,
+			playerMotion
+		} = this;
 
-		let bloodPosition;
-		if (playerID === 1) {
-			bloodPosition = 30; // 第一個玩家的血條在左邊
-		} else {
-			bloodPosition = this.gameWidth - 200; // 第二個玩家的血條在右邊
-		}
+		const headWidth = 40; // 頭像寬
+		const headHeight = 42; // 頭像高
+
+		// 血量條旁邊的頭像 = 1號玩家 距離左邊10px : 2號玩家 距離右邊10px
+		const headPositionX =
+			playerID === 1 ? 10 : gameWidth - (10 + headWidth);
+
+		ctx.drawImage(
+			playerMotion.head,
+			0,
+			0,
+			headWidth,
+			headHeight,
+			headPositionX,
+			5,
+			headWidth,
+			headHeight
+		);
+
+		// 血量條 = 1號玩家 頭像的位置 + 60px : 2號玩家 頭像再往左185
+		const bloodPosition =
+			playerID === 1 ? headPositionX + 60 : headPositionX - 185;
 
 		do_Times(maxBlood)(i => {
 			const color = i < blood ? "red" : "#848484";
