@@ -1,6 +1,42 @@
 <template>
 	<div class="game">
 		<canvas ref="playground" class="playground"></canvas>
+		<div
+			:class="['endingText win', isWin ? 'show' : '']"
+			id="winText"
+			v-on:click="showWinText"
+		>
+			<span>YOU</span>
+			<span> WIN</span>
+		</div>
+		<div
+			:class="['endingText loose', isLoose ? 'show' : '']"
+			id="looseText"
+			v-on:click="showLooseText"
+		>
+			<span>YOU</span>
+			<span> LOOSE</span>
+		</div>
+		<!-- <div :class="['text_loose', isHidden ? 'hidden' : '']">YOU LOOSE</div> -->
+		<!-- 音訊 -->
+		<audio id="backgroundMusic" loop>
+			<source src="@/assets/audio/bgMusic.mp3" type="audio/mp3" />
+		</audio>
+		<audio id="transmitSound">
+			<source src="@/assets/audio/transmit.mp3" type="audio/mp3" />
+		</audio>
+		<audio id="stabSound">
+			<source src="@/assets/audio/stab.mp3" type="audio/mp3" />
+		</audio>
+		<audio id="gameOverSound">
+			<source src="@/assets/audio/gameOver.mp3" type="audio/mp3" />
+		</audio>
+		<audio id="bounceSound">
+			<source src="@/assets/audio/bounce.mp3" type="audio/mp3" />
+		</audio>
+		<audio id="stepSound">
+			<source src="@/assets/audio/step.mp3" type="audio/mp3" />
+		</audio>
 	</div>
 </template>
 
@@ -9,6 +45,7 @@
 import socket from "@/socket";
 import Vec2D from "@/utils/Vector2D";
 import Game from "./GameDual";
+import { PlayerOne, PlayerTwo } from "./MotionCanvas";
 import { mapGetters } from "vuex";
 
 const canvasWidth = 800;
@@ -51,6 +88,9 @@ class Canvas {
 		this.width = this.node.width = canvasWidth;
 		this.height = this.node.height = canvasHeight;
 
+		this.gameInfo();
+	};
+	start = () => {
 		// 遊戲
 		this.game = new Game({
 			ctx: this.ctx,
@@ -59,11 +99,8 @@ class Canvas {
 			...this.initConfigs
 		});
 
-		this.node.addEventListener("mousemove", this.handleMouseMove);
 		requestAnimationFrame(this.render);
 		setInterval(this.update, 1000 / this.updateFPS);
-	};
-	start = () => {
 		this.game.willInit();
 	};
 	update = () => {
@@ -82,6 +119,32 @@ class Canvas {
 		// 滑鼠游標
 		// this.cursor();
 	};
+	gameInfo = () => {
+		const { ctx, width, height } = this;
+
+		const playerMotion = this.initConfigs.controlledPlayerID === 1 ? PlayerOne : PlayerTwo;
+		const headPositionX = width / 2 - (playerMotion.head.width / 2); // 中間 - 頭像寬
+		const headPositionY = height * 0.5;
+
+		ctx.fillStyle = "black";
+		ctx.fillRect(0, 0, this.width, this.height);
+
+		ctx.font = "40px STHeiti, Microsoft JhengHei";
+		ctx.fillStyle = "white";
+		ctx.fillText("YOU ARE", 320, height * 0.33333);
+
+		ctx.drawImage(
+			playerMotion.head,
+			0,
+			0,
+			playerMotion.head.width,
+			playerMotion.head.height,
+			headPositionX,
+			headPositionY,
+			playerMotion.head.width,
+			playerMotion.head.height,
+		);
+	}
 	cursor = () => {
 		const { position } = this.mouse;
 		this.ctx.fillStyle = "red";
@@ -144,8 +207,15 @@ class Canvas {
 }
 
 export default {
+	props: ["resetRoomID"],
 	computed: {
 		...mapGetters(["clientID"])
+	},
+	data: function(){
+		return {
+			isWin: false,
+			isLoose: false,
+		};
 	},
 	mounted: function() {
 		// 遊戲本體
@@ -160,7 +230,6 @@ export default {
 
 		socket.on("GAME_INIT_DATA", payload => {
 			payload.controlledPlayerID = payload.initPlayerConfigs.find(char => char.master === this.clientID).playerID;
-			// console.log('payload', payload);
 			this.canvas.initConfigs = payload;
 
 			this.canvas.init();
@@ -175,16 +244,18 @@ export default {
 		});
 
 		socket.on("UPDATE_RIVAL", payload => {
-			this.canvas.game.players.forEach(player => {
-				let updatedPlayer = player;
-				if (player.playerID === payload.playerID){
-					updatedPlayer.position = payload.position;
-					updatedPlayer.direction = payload.direction;
-					updatedPlayer.isRunning = payload.isRunning;
-				}
-				return updatedPlayer
-			});
+			this.canvas.game.updateRival(payload);
 		});
+	},
+	methods: {
+		showWinText: function(){
+			this.isWin = true;
+			this.resetRoomID();
+		},
+		showLooseText: function(){
+			this.isLoose = true;
+			this.resetRoomID();
+		}
 	}
 };
 </script>
@@ -198,5 +269,51 @@ export default {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+}
+.endingText{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-family: "Press Start 2P";
+	font-size: 40px;
+	span{
+		&:first-child{
+			transition: 0.3s;
+			opacity: 0;
+		}
+		&:last-child{
+			transition: 0.3s 0.3s;
+			opacity: 0;
+		}
+	}
+	&.win{
+		color: gold;
+		text-shadow: 1px 1px 3px #ff0000, 1px 0 5px #0000ff;
+		&.show{
+			span{
+				&:first-child{
+					opacity: 1;
+				}
+				&:last-child{
+					opacity: 1;
+				}
+			}
+		}
+	}
+	&.loose{
+		color: red;
+		text-shadow: 1px 1px 3px gold, 1px 0 5px #0000ff;
+		&.show{
+			span{
+				&:first-child{
+					opacity: 1;
+				}
+				&:last-child{
+					opacity: 1;
+				}
+			}
+		}
+	}
 }
 </style>

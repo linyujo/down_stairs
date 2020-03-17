@@ -25,7 +25,8 @@ export default {
 	watch: {
 		isBattling: {
 			handler: function(bool) {
-				if (bool) {
+				// const currentPath = this.$route;
+				if (bool & (this.$route.path !== "/dual")) {
 					this.$router.push("/dual");
 				}
 			}

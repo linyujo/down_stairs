@@ -65,6 +65,8 @@ PlayerOne.jumpLeft.src = require("@/assets/player1/jumpLeft.png");
 // 頭
 PlayerOne.head = document.createElement("img");
 PlayerOne.head.src = require("@/assets/player1/head.png");
+PlayerOne.head.width = 160;
+PlayerOne.head.height = 162;
 
 /**
  * PlayerTwo
@@ -130,5 +132,7 @@ PlayerTwo.jumpLeft.src = require("@/assets/player2/jumpLeft.png");
 // 頭
 PlayerTwo.head = document.createElement("img");
 PlayerTwo.head.src = require("@/assets/player2/head.png");
+PlayerTwo.head.width = 160;
+PlayerTwo.head.height = 162;
 
 export { PlayerOne, PlayerTwo };

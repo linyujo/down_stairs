@@ -1,7 +1,7 @@
 <template>
 	<div class="dual-view">
 		<div class="dual-view-bg"></div>
-		<Playground v-if="roomID" />
+		<Playground v-if="roomID" :resetRoomID="resetRoomID" />
 		<div v-else class="instruction">
 			Invite instruction
 		</div>
@@ -10,6 +10,7 @@
 
 <script>
 /* eslint-disable */
+import sidebarStatus from "@/store/modules/sidebarStatus";
 import Playground from "@/components/DownStairs/DualGame.vue";
 import socket from "@/socket";
 
@@ -19,13 +20,21 @@ export default {
 	},
 	data: function(){
 		return {
-			roomID: "123_temp",
+			roomID: null,
 		};
 	},
 	mounted: function() {
 		socket.on("BATTLE_ROOM_ID", payload => {
 			this.roomID = payload.roomID
 		});
+	},
+	methods: {
+		resetRoomID: function() {
+			setTimeout(() => {
+				this.roomID = null;
+			}, 10000);
+			this.$store.dispatch(sidebarStatus.actionTypes.RESET_IDLE);
+		}
 	}
 }
 
@@ -45,5 +54,8 @@ export default {
 	width: 100%;
 	height: 100%;
 	background: #272727;
+}
+.instruction{
+	color: white;
 }
 </style>

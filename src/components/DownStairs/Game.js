@@ -84,12 +84,12 @@ export default class Game {
 		}
 		// 時間
 		this.time++;
-		// 玩家
-		this.updatePlayers();
 		// 階梯
 		this.updateStairs();
 		// 玩家與階梯互動
 		this.checkPlayerAndStairInteraction();
+		// 玩家
+		this.updatePlayers();
 	};
 	render = () => {
 		this.ctx.save();

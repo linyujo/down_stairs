@@ -6,9 +6,38 @@ import {
 	do_Times,
 	// playSound,
 	// stopSound,
-	// weightedRandom
 } from "@/utils/utilFuncs";
 import socket from "@/socket";
+
+function isPlayerOnAStair(stair, player) {
+	/*
+	 *
+	 *        -----
+	 *        |   |
+	 *        |   |
+	 *        -----
+	 * |-------@-------|
+	 */
+	const stairLeft = stair.position.x - stair.width / 2; // 樓梯左邊的邊界
+	const stairRight = stair.position.x + stair.width / 2; // 牆壁右側的邊界
+	const playerLeft = player.position.x - player.width / 2; // 玩家左側的邊界
+	const playerRight = player.position.x + player.width / 2; // 玩家右側的邊界
+
+	const playerBottom = player.position.y;
+	const stairTop = stair.position.y;
+	const stairBottom = stair.position.y + stair.height + 10; // 10為寬容值, 避免速度太快, 沒有抓到
+
+	let isOnTheStair = false;
+	if (stairLeft < playerRight && stairRight > playerLeft) {
+		// 寬度判斷
+		if (playerBottom > stairTop && playerBottom < stairBottom) {
+			// 高度判斷
+			isOnTheStair = true;
+		}
+	}
+
+	return isOnTheStair;
+}
 
 export default class DualGame {
 	constructor(args) {
@@ -53,12 +82,14 @@ export default class DualGame {
 		}
 		// 時間
 		this.time++;
-		// 玩家
-		this.updatePlayers();
+		
 		// 階梯
 		this.updateStairs();
 		// 玩家與階梯互動
 		// this.checkPlayerAndStairInteraction();
+		// 玩家
+		this.updatePlayers();
+
 	};
 	render = () => {
 		this.ctx.save();
@@ -90,7 +121,16 @@ export default class DualGame {
 	}
 	willUnmount = () => {
 		this.isPlaying = false;
-		// document.getElementById("startButton").click();
+		const { players, controlledPlayerID, roomID } = this;
+		const myCharactor = players[controlledPlayerID - 1];
+		if (myCharactor.blood === 0) {
+			document.getElementById("looseText").click();
+		} else {
+			document.getElementById("winText").click();
+		}
+		socket.emit("GAME_END", {
+			roomID: roomID
+		});
 	}
 	renderStairCount = () => {
 		const { ctx, time } = this;
@@ -172,11 +212,21 @@ export default class DualGame {
 	};
 	updatePlayers = () => {
 		const { width, height, controlledPlayerID, roomID, keyStatus } = this;
+
 		this.players.forEach(player => {
-			checkBorder(player);
+			checkBorder(player); // 檢查玩家是否碰到遊戲邊界
+
+			if (player.blood === 0) {
+				this.willUnmount();
+			}
+			if (player.position.y > height + player.height) {
+				// 如果其中一個玩家掉出遊戲高度，血量歸零
+				player.blood = 0;
+			}
 			if (player.playerID !== controlledPlayerID) {
 				return;
 			}
+			player.update();
 			// 如果左鍵按下，控制中的角色向左，並移動
 			if (keyStatus.left) {
 				player.direction = false;
@@ -192,16 +242,12 @@ export default class DualGame {
 			if (!keyStatus.left && !keyStatus.right) {
 				player.isRunning = false;
 			}
-			socket.emit("UPDATE_RIVAL", {
-				roomID: roomID,
-				playerID: controlledPlayerID,
-				position: player.position,
-				direction: player.direction,
-				isRunning: player.isRunning,
-				isHurt: player.isHurt,
-				blood: player.blood,
-			});
 		});
+
+		this.checkPlayerAndStairInteraction(); // 玩家與階梯互動
+
+		this.emitPosition();
+
 		function checkBorder(player) {
 			if (player.position.x - player.width / 2 < 0) {
 				// 檢查玩家是否超出左邊界
@@ -213,6 +259,38 @@ export default class DualGame {
 			}
 		}
 	}
+	emitPosition = () => {
+		const { players, controlledPlayerID, roomID } = this;
+		const myCharactor = players[controlledPlayerID - 1];
+		socket.emit("UPDATE_RIVAL", {
+			roomID: roomID,
+			playerID: controlledPlayerID,
+			position: myCharactor.position,
+			v: myCharactor.v,
+			direction: myCharactor.direction,
+			isRunning: myCharactor.isRunning,
+			isHurt: myCharactor.isHurt,
+			blood: myCharactor.blood,
+		});
+	}
+	updateRival = payload => {
+		this.players.forEach(player => {
+			if (player.playerID === payload.playerID){
+				player.position = new Vec2D(
+					payload.position.x,
+					payload.position.y
+				);
+				player.v = new Vec2D(
+					payload.v.x,
+					payload.v.y
+				);  
+				player.direction = payload.direction;
+				player.isRunning = payload.isRunning;
+				player.isHurt = payload.isHurt;
+				player.blood = payload.blood;
+			}
+		});
+	}
 	renderPlayers = () => {
 		this.players.forEach(player => {
 			player.render();
@@ -223,4 +301,78 @@ export default class DualGame {
 			player.drawBlood();
 		});
 	};
+	checkPlayerAndStairInteraction = () => {
+		const { stairs, players, controlledPlayerID } = this;
+
+		stairs.forEach(stair => {
+			players.forEach(player => {
+				const isOn = isPlayerOnAStair(stair, player);
+				if (isOn) {
+					player.playerID === controlledPlayerID ? controlledPlayer(player, stair) : rival(player, stair);
+					player.latestStair = stair;
+				}
+			});
+		});
+
+		function controlledPlayer(player, stair){
+			player.v.y = 0; // 角色的y速度為0
+			const isLatestStair = player.latestStair === stair;
+
+			if (stair.type !== "fade") {
+				player.position.y = stair.position.y; // 角色的y座標與階梯相同，流沙除外
+			}
+			switch (stair.type){
+				case "jump":
+					player.v.y = -10;
+					stair.extraHeight = 10;
+					// eslint-disable-next-line no-undef
+					TweenMax.to(stair, 0.2, { extraHeight: 0 }); // 彈簧效果
+					if (!isLatestStair) {
+						// playSound("bounceSound");
+					}
+					break;
+				case "slideLeft":
+					player.position.x -= 3;
+					if (!isLatestStair) {
+						// playSound("transmitSound", 0.5);
+					}
+					break;
+				case "slideRight":
+					player.position.x += 3;
+					if (!isLatestStair) {
+						// playSound("transmitSound", 0.5);
+					}
+					break;
+				case "fade":
+					player.position.y -= 3;
+					break;
+				case "blade":
+					if (!isLatestStair) {
+						// 如果踩到的階梯 是同一個，不要重複 扣血
+						player.bloodDelta(-1);
+						// 受傷音效在扣血時播放
+					}
+					break;
+				case "normal":
+					if (!isLatestStair) {
+						// 如果踩到的階梯 是同一個，不要重複 補血
+						player.bloodDelta(+1);
+						// playSound("stepSound");
+					}
+					break;
+				default:
+					break;
+			}
+
+			player.latestStair = stair;
+		}
+
+		function rival(player, stair){
+			if (stair.type === "jump") {
+				stair.extraHeight = 10;
+				// eslint-disable-next-line no-undef
+				TweenMax.to(stair, 0.2, { extraHeight: 0 }); // 彈簧效果
+			}
+		}
+	}
 }
