@@ -1,12 +1,7 @@
-/* eslint-disable */
 import Vec2D from "@/utils/Vector2D";
 import Stair from "./Stair";
 import Player from "./Player";
-import {
-	do_Times,
-	// playSound,
-	// stopSound,
-} from "@/utils/utilFuncs";
+import { do_Times, playSound, stopSound } from "@/utils/utilFuncs";
 import socket from "@/socket";
 
 function isPlayerOnAStair(stair, player) {
@@ -69,7 +64,7 @@ export default class DualGame {
 	};
 	init = () => {
 		// 音樂
-		// playSound("backgroundMusic", 0.8);
+		playSound("backgroundMusic", 0.8);
 		// 玩家
 		this.createPlayers();
 		// 樓梯
@@ -82,14 +77,13 @@ export default class DualGame {
 		}
 		// 時間
 		this.time++;
-		
+
 		// 階梯
 		this.updateStairs();
 		// 玩家與階梯互動
 		// this.checkPlayerAndStairInteraction();
 		// 玩家
 		this.updatePlayers();
-
 	};
 	render = () => {
 		this.ctx.save();
@@ -118,17 +112,20 @@ export default class DualGame {
 		this.renderPlayerBlood();
 
 		this.renderStairCount();
-	}
+	};
 	willUnmount = () => {
 		this.isPlaying = false;
+		stopSound("backgroundMusic");
 		const { players, controlledPlayerID } = this;
 		const myCharactor = players[controlledPlayerID - 1];
 		if (myCharactor.blood === 0) {
 			document.getElementById("looseText").click();
+			playSound("gameOverSound", 0.2);
 		} else {
 			document.getElementById("winText").click();
+			playSound("gameWinSound", 0.6);
 		}
-	}
+	};
 	renderStairCount = () => {
 		const { ctx, time } = this;
 		ctx.font = "30px STHeiti, Microsoft JhengHei";
@@ -145,7 +142,7 @@ export default class DualGame {
 				new Stair({
 					position: new Vec2D(
 						initStairConfigs[i].position.x,
-						initStairConfigs[i].position.y,
+						initStairConfigs[i].position.y
 					),
 					type: initStairConfigs[i].type,
 					ctx: ctx
@@ -153,15 +150,15 @@ export default class DualGame {
 			);
 		});
 		this.stairs = [...initStairs];
-	}
+	};
 	updateStairs = () => {
-		const { stairs, time, width, height, stairTypes } = this;
+		const { stairs } = this;
 		stairs.forEach(stair => {
 			stair.update();
 		});
 		this.stairs = stairs.filter(stair => stair.isActive); // 遊戲只留下仍在畫面中的階梯
-	}
-	addNewStair = (newStairConfig) => {
+	};
+	addNewStair = newStairConfig => {
 		const { stairs, ctx } = this;
 		this.stairs = [
 			...stairs,
@@ -174,7 +171,7 @@ export default class DualGame {
 				ctx: ctx
 			})
 		];
-	}
+	};
 	renderStairs = () => {
 		this.stairs.forEach(stair => {
 			stair.render();
@@ -186,7 +183,7 @@ export default class DualGame {
 			playerID: initPlayerConfigs[0].playerID,
 			position: new Vec2D(
 				initPlayerConfigs[0].position.x,
-				initPlayerConfigs[0].position.y,
+				initPlayerConfigs[0].position.y
 			),
 			ctx: ctx,
 			gameWidth: width
@@ -196,7 +193,7 @@ export default class DualGame {
 			playerID: initPlayerConfigs[1].playerID,
 			position: new Vec2D(
 				initPlayerConfigs[1].position.x,
-				initPlayerConfigs[1].position.y,
+				initPlayerConfigs[1].position.y
 			),
 			ctx: ctx,
 			gameWidth: width
@@ -208,7 +205,7 @@ export default class DualGame {
 		this.players = [player1, player2];
 	};
 	updatePlayers = () => {
-		const { width, height, controlledPlayerID, roomID, keyStatus } = this;
+		const { width, height, controlledPlayerID, keyStatus } = this;
 
 		this.players.forEach(player => {
 			checkBorder(player); // 檢查玩家是否碰到遊戲邊界
@@ -255,7 +252,7 @@ export default class DualGame {
 				player.position.x = width - player.width / 2;
 			}
 		}
-	}
+	};
 	emitPosition = () => {
 		const { players, controlledPlayerID, roomID } = this;
 		const myCharactor = players[controlledPlayerID - 1];
@@ -267,27 +264,24 @@ export default class DualGame {
 			direction: myCharactor.direction,
 			isRunning: myCharactor.isRunning,
 			isHurt: myCharactor.isHurt,
-			blood: myCharactor.blood,
+			blood: myCharactor.blood
 		});
-	}
+	};
 	updateRival = payload => {
 		this.players.forEach(player => {
-			if (player.playerID === payload.playerID){
+			if (player.playerID === payload.playerID) {
 				player.position = new Vec2D(
 					payload.position.x,
 					payload.position.y
 				);
-				player.v = new Vec2D(
-					payload.v.x,
-					payload.v.y
-				);  
+				player.v = new Vec2D(payload.v.x, payload.v.y);
 				player.direction = payload.direction;
 				player.isRunning = payload.isRunning;
 				player.isHurt = payload.isHurt;
 				player.blood = payload.blood;
 			}
 		});
-	}
+	};
 	renderPlayers = () => {
 		this.players.forEach(player => {
 			player.render();
@@ -305,39 +299,41 @@ export default class DualGame {
 			players.forEach(player => {
 				const isOn = isPlayerOnAStair(stair, player);
 				if (isOn) {
-					player.playerID === controlledPlayerID ? controlledPlayer(player, stair) : rival(player, stair);
+					player.playerID === controlledPlayerID
+						? controlledPlayer(player, stair)
+						: rival(player, stair);
 					player.latestStair = stair;
 				}
 			});
 		});
 
-		function controlledPlayer(player, stair){
+		function controlledPlayer(player, stair) {
 			player.v.y = 0; // 角色的y速度為0
 			const isLatestStair = player.latestStair === stair;
 
 			if (stair.type !== "fade") {
 				player.position.y = stair.position.y; // 角色的y座標與階梯相同，流沙除外
 			}
-			switch (stair.type){
+			switch (stair.type) {
 				case "jump":
 					player.v.y = -10;
 					stair.extraHeight = 10;
 					// eslint-disable-next-line no-undef
 					TweenMax.to(stair, 0.2, { extraHeight: 0 }); // 彈簧效果
 					if (!isLatestStair) {
-						// playSound("bounceSound");
+						playSound("bounceSound");
 					}
 					break;
 				case "slideLeft":
 					player.position.x -= 3;
 					if (!isLatestStair) {
-						// playSound("transmitSound", 0.5);
+						playSound("transmitSound", 0.5);
 					}
 					break;
 				case "slideRight":
 					player.position.x += 3;
 					if (!isLatestStair) {
-						// playSound("transmitSound", 0.5);
+						playSound("transmitSound", 0.5);
 					}
 					break;
 				case "fade":
@@ -354,7 +350,7 @@ export default class DualGame {
 					if (!isLatestStair) {
 						// 如果踩到的階梯 是同一個，不要重複 補血
 						player.bloodDelta(+1);
-						// playSound("stepSound");
+						playSound("stepSound");
 					}
 					break;
 				default:
@@ -364,12 +360,25 @@ export default class DualGame {
 			player.latestStair = stair;
 		}
 
-		function rival(player, stair){
+		function rival(player, stair) {
 			if (stair.type === "jump") {
 				stair.extraHeight = 10;
 				// eslint-disable-next-line no-undef
 				TweenMax.to(stair, 0.2, { extraHeight: 0 }); // 彈簧效果
 			}
 		}
-	}
+	};
+	renderRoofBlade = () => {
+		const { ctx, width } = this;
+		const span = width / 90; // 底 高 底 高 ...共16條線，每一份佔1/16的寬度
+
+		ctx.beginPath();
+		do_Times(1 + 90)(i => {
+			// 起點...第一條(上)...第二條(下)...第三條(上)...    要畫 (起點)＋60條線，故含起點是 1 + 60
+			ctx.lineTo(i * span, (i % 2) * 16);
+		});
+		ctx.fillStyle = "#ddd";
+
+		ctx.fill();
+	};
 }

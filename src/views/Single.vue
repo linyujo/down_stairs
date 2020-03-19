@@ -6,15 +6,13 @@
 </template>
 
 <script>
-/* eslint-disable */
 import Playground from "@/components/DownStairs/SingleGame.vue";
 
 export default {
 	components: {
-		Playground: Playground,
-	},
-}
-
+		Playground: Playground
+	}
+};
 </script>
 
 <style lang="scss" scoped>

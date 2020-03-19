@@ -59,12 +59,8 @@
 </template>
 
 <script>
-/* eslint-disable */
 // @ is an alias to /src
-import { mapGetters } from "vuex";
-
 import Modal from "@/components/Modal/Modal.vue";
-import game from "@/store/modules/gameMode";
 
 const stairTypes = [
 	{
@@ -96,13 +92,13 @@ const stairTypes = [
 
 export default {
 	components: {
-		Modal,
+		Modal
 	},
 	data() {
 		return {
 			singleIcon: require("@/assets/home/single.png"),
 			dualIcon: require("@/assets/home/dual.png"),
-			hoveredLink: 'single',
+			hoveredLink: "single",
 			showModal: false,
 			firstTwoItems: stairTypes.slice(0, 2),
 			leftItems: stairTypes.slice(2, 5)
@@ -112,7 +108,7 @@ export default {
 		handleMouseOver(hovered) {
 			this.hoveredLink = hovered;
 		}
-	},
+	}
 };
 </script>
 
@@ -174,53 +170,53 @@ export default {
 	left: 50%;
 	transform: translate(-50%, -40%);
 	z-index: 1;
-	ul{
+	ul {
 		list-style-type: none;
 		display: flex;
 		justify-content: center;
 		padding-left: 0;
 		margin-bottom: 0;
-		li{
-			&:nth-child(1){
+		li {
+			&:nth-child(1) {
 				margin-right: 20px;
 			}
-			&:nth-child(2){
+			&:nth-child(2) {
 				margin-left: 20px;
 			}
-			.link-desc{
+			.link-desc {
 				color: white;
 				transition: all 0.2s ease-in-out;
 			}
-			&:hover{
-				.link-desc{
-					color: #31B404;
+			&:hover {
+				.link-desc {
+					color: #31b404;
 					font-weight: bold;
-				}	
+				}
 			}
-			img{
+			img {
 				display: block;
 				margin-bottom: 16px;
 			}
 		}
 	}
 }
-.slider{
+.slider {
 	width: 100%;
 	margin-top: 10px;
 	.indicator {
-      	height: 4px;
+		height: 4px;
 		width: 100px;
 		background: #2a8641;
 		border-radius: 1px;
 		transition: all 0.3s ease-in-out;
-    }
-	&.single{
-		.indicator{
+	}
+	&.single {
+		.indicator {
 			transform: translateX(50%);
 		}
 	}
-	&.dual{
-		.indicator{
+	&.dual {
+		.indicator {
 			transform: translateX(290%);
 		}
 	}

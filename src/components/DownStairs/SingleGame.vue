@@ -32,11 +32,9 @@
 </template>
 
 <script>
-/* eslint-disable */
 import Vec2D from "@/utils/Vector2D";
 
 import Game from "./Game";
-import PlayerAction from "./PlayerAction";
 
 const canvasWidth = 800;
 const canvasHeight = 600;
@@ -212,7 +210,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.game{
+.game {
 	height: 100%;
 }
 .playground {

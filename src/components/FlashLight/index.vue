@@ -25,7 +25,6 @@
 </template>
 
 <script>
-/* eslint-disable */
 class FlashLight {
 	node;
 	ctx;
@@ -134,19 +133,25 @@ export default {
 			isBlur: false
 		};
 	},
-	mounted: function(){
+	mounted: function() {
 		this.initFlashLight();
 	},
 	beforeUpdate: function() {
 		this.initFlashLight();
 	},
 	beforeDestroy: function() {
-		this.$refs.flashLightWrapper.removeEventListener("mousemove", this.handleMouseMove);
-		this.$refs.flashLightWrapper.removeEventListener("mouseout", this.handleMouseOut);
+		this.$refs.flashLightWrapper.removeEventListener(
+			"mousemove",
+			this.handleMouseMove
+		);
+		this.$refs.flashLightWrapper.removeEventListener(
+			"mouseout",
+			this.handleMouseOut
+		);
 		this.flashLight = null;
 	},
 	methods: {
-		initFlashLight: function(){
+		initFlashLight: function() {
 			if (this.flashLight) {
 				return;
 			}
@@ -159,14 +164,20 @@ export default {
 				this.appendHeight
 			);
 			this.flashLight.init();
-			this.$refs.flashLightWrapper.addEventListener("mousemove", this.handleMouseMove);
-			this.$refs.flashLightWrapper.addEventListener("mouseout", this.handleMouseOut);
+			this.$refs.flashLightWrapper.addEventListener(
+				"mousemove",
+				this.handleMouseMove
+			);
+			this.$refs.flashLightWrapper.addEventListener(
+				"mouseout",
+				this.handleMouseOut
+			);
 		},
-		handleMouseMove: function(evt){
+		handleMouseMove: function(evt) {
 			this.isBlur = false;
 			this.flashLight.handleMouseMove(evt);
 		},
-		handleMouseOut: function(){
+		handleMouseOut: function() {
 			this.isBlur = true;
 			this.flashLight.handleMouseOut();
 		}
@@ -179,21 +190,21 @@ $color-black: #272727;
 $color-white: #fff;
 $size: 170px; // (Fully responsive)
 
-.flashLight-wrapper{
+.flashLight-wrapper {
 	position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-	.cat-wrapper{
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	.cat-wrapper {
 		width: 100%;
-    	height: 100%;
+		height: 100%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		opacity: 0;
 		transition: opacity 0.1s;
-		&.show{
+		&.show {
 			opacity: 1;
 			z-index: 1;
 		}
@@ -207,18 +218,18 @@ $size: 170px; // (Fully responsive)
 }
 
 // Ears
-.ear{
+.ear {
 	position: absolute;
 	top: -30%;
 	height: 60%;
 	width: 25%;
 	background: $color-white;
-	&.ear--left{
+	&.ear--left {
 		left: -7%;
 		border-radius: 70% 30% 0% 0% / 100% 100% 0% 0%;
 		transform: rotate(-15deg);
 	}
-	&.ear--right{
+	&.ear--right {
 		right: -7%;
 		border-radius: 30% 70% 0% 0% / 100% 100% 0% 0%;
 		transform: rotate(15deg);
@@ -242,15 +253,15 @@ $size: 170px; // (Fully responsive)
 	width: 31%;
 	background: $color-white;
 	border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-	&.eye--left{
+	&.eye--left {
 		left: 0;
 	}
-	&.eye--right{
+	&.eye--right {
 		right: 0;
 	}
 	// 眼皮
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -261,12 +272,20 @@ $size: 170px; // (Fully responsive)
 		animation: blink 4s infinite ease-in;
 	}
 	@keyframes blink {
-		0% { height: 0; }
-		90% { height: 0; }
+		0% {
+			height: 0;
+		}
+		90% {
+			height: 0;
+		}
 		// 92.5% { height: 100%; }
 		// 95% { height: 0; }
-		97.5% { height: 100%; }
-		100% { height: 0; }
+		97.5% {
+			height: 100%;
+		}
+		100% {
+			height: 0;
+		}
 	}
 }
 
@@ -281,13 +300,27 @@ $size: 170px; // (Fully responsive)
 	animation: look-around 4s infinite;
 
 	@keyframes look-around {
-		0% { transform: translate(0) }
-		5% { transform: translate(50%, -25%) }
-		10% { transform: translate(50%, -25%) }
-		15% { transform: translate(-100%, -25%) }
-		20% { transform: translate(-100%, -25%) }
-		25% { transform: translate(0, 0) }
-		100% { transform: translate(0, 0) }
+		0% {
+			transform: translate(0);
+		}
+		5% {
+			transform: translate(50%, -25%);
+		}
+		10% {
+			transform: translate(50%, -25%);
+		}
+		15% {
+			transform: translate(-100%, -25%);
+		}
+		20% {
+			transform: translate(-100%, -25%);
+		}
+		25% {
+			transform: translate(0, 0);
+		}
+		100% {
+			transform: translate(0, 0);
+		}
 	}
 
 	.eye--left & {
@@ -298,7 +331,7 @@ $size: 170px; // (Fully responsive)
 	}
 	// 眼白
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 30%;
 		right: -5%;
@@ -320,5 +353,4 @@ $size: 170px; // (Fully responsive)
 	transform: translateX(-50%);
 	border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
 }
-
 </style>

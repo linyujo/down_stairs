@@ -34,9 +34,7 @@
 </template>
 
 <script>
-/* eslint-disable */
 import sidebarStatus from "@/store/modules/sidebarStatus";
-import user from "@/store/modules/user";
 import Playground from "@/components/DownStairs/DualGame.vue";
 import FlashLight from "@/components/FlashLight";
 import socket from "@/socket";
@@ -46,7 +44,7 @@ export default {
 		Playground: Playground,
 		FlashLight: FlashLight
 	},
-	data: function(){
+	data: function() {
 		return {
 			roomID: null,
 			inviteDemo1: require("@/assets/instructions/inviteDemo1.png"),
@@ -73,16 +71,14 @@ export default {
 				this.$store.dispatch(sidebarStatus.actionTypes.RESET_IDLE);
 			}, 3000);
 		}
-	},
-	
-}
-
+	}
+};
 </script>
 
 <style lang="scss" scoped>
 .dual-view {
 	height: 100%;
-	.instruction{
+	.instruction {
 		color: white;
 	}
 }
@@ -94,20 +90,20 @@ export default {
 	height: 100%;
 	background: #272727;
 }
-.instruction{
+.instruction {
 	background: #fefefe;
-	height: 100%;;
+	height: 100%;
 }
-.instruction-content{
+.instruction-content {
 	top: 50%;
 	transform: translateY(-50%);
 	color: black;
 	font-size: 1em;
 	line-height: 1.5em;
-	.inviteDemo1{
+	.inviteDemo1 {
 		margin: 16px 0;
 	}
-	.inviteDemo2{
+	.inviteDemo2 {
 		margin: 14px 0;
 	}
 }

@@ -31,6 +31,9 @@
 		<audio id="gameOverSound">
 			<source src="@/assets/audio/gameOver.mp3" type="audio/mp3" />
 		</audio>
+		<audio id="gameWinSound">
+			<source src="@/assets/audio/gameWin.mp3" type="audio/mp3" />
+		</audio>
 		<audio id="bounceSound">
 			<source src="@/assets/audio/bounce.mp3" type="audio/mp3" />
 		</audio>
@@ -41,7 +44,6 @@
 </template>
 
 <script>
-/* eslint-disable */
 import socket from "@/socket";
 import Vec2D from "@/utils/Vector2D";
 import Game from "./GameDual";
@@ -64,7 +66,8 @@ class Canvas {
 		posUp: new Vec2D(0, 0)
 	};
 	game = null;
-	initConfigs = { // socket傳來的初始設定
+	initConfigs = {
+		// socket傳來的初始設定
 		roomID: 0,
 		initStairConfigs: [],
 		initPlayerConfigs: []
@@ -121,13 +124,14 @@ class Canvas {
 	};
 	unmount = () => {
 		window.removeEventListener("keydown", this.handleKeyDown);
-		window.removeEventListener("keyup", this.handleKeyUp)
-	}
+		window.removeEventListener("keyup", this.handleKeyUp);
+	};
 	gameInfo = () => {
 		const { ctx, width, height } = this;
 
-		const playerMotion = this.initConfigs.controlledPlayerID === 1 ? PlayerOne : PlayerTwo;
-		const headPositionX = width / 2 - (playerMotion.head.width / 2); // 中間 - 頭像寬
+		const playerMotion =
+			this.initConfigs.controlledPlayerID === 1 ? PlayerOne : PlayerTwo;
+		const headPositionX = width / 2 - playerMotion.head.width / 2; // 中間 - 頭像寬
 		const headPositionY = height * 0.5;
 
 		ctx.fillStyle = "black";
@@ -146,9 +150,9 @@ class Canvas {
 			headPositionX,
 			headPositionY,
 			playerMotion.head.width,
-			playerMotion.head.height,
+			playerMotion.head.height
 		);
-	}
+	};
 	handleKeyDown = evt => {
 		if (!this.game) {
 			return;
@@ -178,7 +182,7 @@ export default {
 	computed: {
 		...mapGetters(["clientID"])
 	},
-	data: function(){
+	data: function() {
 		return {
 			isWin: false,
 			isLoose: false,
@@ -190,7 +194,9 @@ export default {
 		this.canvas = new Canvas(this.$refs.playground);
 
 		socket.on("GAME_INIT_DATA", payload => {
-			payload.controlledPlayerID = payload.initPlayerConfigs.find(char => char.master === this.clientID).playerID;
+			payload.controlledPlayerID = payload.initPlayerConfigs.find(
+				char => char.master === this.clientID
+			).playerID;
 			this.canvas.initConfigs = payload;
 
 			this.canvas.init();
@@ -208,24 +214,24 @@ export default {
 			this.canvas.game.updateRival(payload);
 		});
 	},
-	beforeDestroy: function(){
-		socket.off('GAME_INIT_DATA');
-		socket.off('GAME_START');
-		socket.off('NEW_STAIR_CONFIG');
-		socket.off('UPDATE_RIVAL');
+	beforeDestroy: function() {
+		socket.off("GAME_INIT_DATA");
+		socket.off("GAME_START");
+		socket.off("NEW_STAIR_CONFIG");
+		socket.off("UPDATE_RIVAL");
 		this.canvas.unmount();
 		this.canvas = null;
 	},
 	methods: {
-		showWinText: function(){
+		showWinText: function() {
 			this.isWin = true;
 			this.emitEndGame();
 		},
-		showLooseText: function(){
+		showLooseText: function() {
 			this.isLoose = true;
 			this.emitEndGame();
 		},
-		emitEndGame: function(){
+		emitEndGame: function() {
 			socket.emit("GAME_END", {
 				roomID: this.roomID
 			});
@@ -236,7 +242,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.game{
+.game {
 	height: 100%;
 }
 .playground {
@@ -245,46 +251,46 @@ export default {
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
-.endingText{
+.endingText {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	font-family: "Press Start 2P";
 	font-size: 40px;
-	span{
-		&:first-child{
+	span {
+		&:first-child {
 			transition: 0.3s;
 			opacity: 0;
 		}
-		&:last-child{
+		&:last-child {
 			transition: 0.3s 0.3s;
 			opacity: 0;
 		}
 	}
-	&.win{
+	&.win {
 		color: gold;
 		text-shadow: 1px 1px 3px #ff0000, 1px 0 5px #0000ff;
-		&.show{
-			span{
-				&:first-child{
+		&.show {
+			span {
+				&:first-child {
 					opacity: 1;
 				}
-				&:last-child{
+				&:last-child {
 					opacity: 1;
 				}
 			}
 		}
 	}
-	&.loose{
+	&.loose {
 		color: red;
 		text-shadow: 1px 1px 3px gold, 1px 0 5px #0000ff;
-		&.show{
-			span{
-				&:first-child{
+		&.show {
+			span {
+				&:first-child {
 					opacity: 1;
 				}
-				&:last-child{
+				&:last-child {
 					opacity: 1;
 				}
 			}

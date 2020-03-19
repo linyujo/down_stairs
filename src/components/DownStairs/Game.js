@@ -40,7 +40,7 @@ function isPlayerOnAStair(stair, player) {
 
 export default class Game {
 	constructor(args) {
-		this.players = [];
+		this.player = null;
 		this.stairs = [];
 		this.width = 800;
 		this.height = 600;
@@ -60,7 +60,6 @@ export default class Game {
 			right: false,
 			space: false // 暫停
 		};
-		// this.game = null;
 		this.controlledPlayerID = 1;
 		this.ctx = args.ctx;
 	}
@@ -86,8 +85,6 @@ export default class Game {
 		this.time++;
 		// 階梯
 		this.updateStairs();
-		// 玩家與階梯互動
-		this.checkPlayerAndStairInteraction();
 		// 玩家
 		this.updatePlayers();
 	};
@@ -201,40 +198,43 @@ export default class Game {
 			gameWidth: this.width
 		});
 		player.init();
-		this.players = [player];
+		this.player = player;
 	};
 	updatePlayers = () => {
-		const { width, height, controlledPlayerID, keyStatus } = this;
-		this.players.forEach(player => {
-			player.update();
-			checkBorder(player);
-			if (player.blood === 0) {
-				this.willUnmount();
-			}
-			if (player.position.y > height + player.height) {
-				// 如果其中一個玩家掉出遊戲高度，血量歸零
-				player.blood = 0;
-			}
-			if (player.playerID !== controlledPlayerID) {
-				return;
-			}
-			// 如果左鍵按下，控制中的角色向左，並移動
-			if (keyStatus.left) {
-				player.direction = false;
-				player.isRunning = true;
-				player.position.x -= 8; // 往左
-			}
-			// 如果右鍵按下，控制中的角色向右
-			if (keyStatus.right) {
-				player.direction = true;
-				player.isRunning = true;
-				player.position.x += 8; // 往右
-			}
+		const { width, height, controlledPlayerID, keyStatus, player } = this;
 
-			if (!keyStatus.left && !keyStatus.right) {
-				player.isRunning = false;
-			}
-		});
+		player.update();
+		checkBorder(player);
+		if (player.blood === 0) {
+			this.willUnmount();
+		}
+		if (player.position.y > height + player.height) {
+			// 如果其中一個玩家掉出遊戲高度，血量歸零
+			player.blood = 0;
+		}
+		if (player.playerID !== controlledPlayerID) {
+			return;
+		}
+		// 如果左鍵按下，控制中的角色向左，並移動
+		if (keyStatus.left) {
+			player.direction = false;
+			player.isRunning = true;
+			player.position.x -= 8; // 往左
+		}
+		// 如果右鍵按下，控制中的角色向右
+		if (keyStatus.right) {
+			player.direction = true;
+			player.isRunning = true;
+			player.position.x += 8; // 往右
+		}
+
+		if (!keyStatus.left && !keyStatus.right) {
+			player.isRunning = false;
+		}
+
+		// 玩家與階梯互動
+		this.checkPlayerAndStairInteraction();
+
 		function checkBorder(player) {
 			if (player.position.x - player.width / 2 < 0) {
 				// 檢查玩家是否超出左邊界
@@ -247,14 +247,12 @@ export default class Game {
 		}
 	};
 	renderPlayers = () => {
-		this.players.forEach(player => {
-			player.render();
-		});
+		if (!this.player) return;
+		this.player.render();
 	};
 	renderPlayerBlood = () => {
-		this.players.forEach(player => {
-			player.drawBlood();
-		});
+		if (!this.player) return;
+		this.player.drawBlood();
 	};
 	renderStairCount = () => {
 		const { ctx, time } = this;
@@ -276,17 +274,15 @@ export default class Game {
 		ctx.fill();
 	};
 	checkPlayerAndStairInteraction = () => {
-		const { stairs, players } = this;
+		const { stairs, player } = this;
 
 		stairs.forEach(stair => {
-			players.forEach(player => {
-				const isOn = isPlayerOnAStair(stair, player);
-				if (isOn) {
-					stairTypeInteraction(stair, player);
-					stairSonud(stair, player);
-					player.latestStair = stair;
-				}
-			});
+			const isOn = isPlayerOnAStair(stair, player);
+			if (isOn) {
+				stairTypeInteraction(stair, player);
+				stairSonud(stair, player);
+				player.latestStair = stair;
+			}
 		});
 
 		function stairSonud(stair, player) {
