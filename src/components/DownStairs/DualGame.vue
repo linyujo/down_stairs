@@ -194,9 +194,17 @@ export default {
 		this.canvas = new Canvas(this.$refs.playground);
 
 		socket.on("GAME_INIT_DATA", payload => {
-			payload.controlledPlayerID = payload.initPlayerConfigs.find(
-				char => char.master === this.clientID
-			).playerID;
+			let controlledPlayerID;
+			let rivalPlayerID;
+			payload.initPlayerConfigs.forEach(charactor => {
+				if (charactor.master === this.clientID) {
+					controlledPlayerID = charactor.playerID;
+				} else {
+					rivalPlayerID = charactor.playerID;
+				}
+			});
+			payload.controlledPlayerID = controlledPlayerID;
+			payload.rivalPlayerID = rivalPlayerID;
 			this.canvas.initConfigs = payload;
 
 			this.canvas.init();

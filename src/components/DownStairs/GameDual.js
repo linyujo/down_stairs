@@ -268,19 +268,14 @@ export default class DualGame {
 		});
 	};
 	updateRival = payload => {
-		this.players.forEach(player => {
-			if (player.playerID === payload.playerID) {
-				player.position = new Vec2D(
-					payload.position.x,
-					payload.position.y
-				);
-				player.v = new Vec2D(payload.v.x, payload.v.y);
-				player.direction = payload.direction;
-				player.isRunning = payload.isRunning;
-				player.isHurt = payload.isHurt;
-				player.blood = payload.blood;
-			}
-		});
+		const { players, rivalPlayerID } = this;
+		const rival = players[rivalPlayerID - 1];
+		rival.position = new Vec2D(payload.position.x, payload.position.y);
+		rival.v = new Vec2D(payload.v.x, payload.v.y);
+		rival.direction = payload.direction;
+		rival.isRunning = payload.isRunning;
+		rival.isHurt = payload.isHurt;
+		rival.blood = payload.blood;
 	};
 	renderPlayers = () => {
 		this.players.forEach(player => {
