@@ -1,6 +1,6 @@
 <template>
 	<div class="invited">
-		<div class="username">{{ inviter.username }}</div>
+		<div class="username">{{ inviteData.inviter.username }}</div>
 		想與你<br />
 		來一場激烈的決鬥
 		<div class="btn-gruop">
@@ -16,12 +16,14 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import socket from "@/socket";
 import sidebar from "@/store/modules/sidebarStatus";
-import user from "@/store/modules/user";
 
 export default {
-	props: ["inviter"],
+	computed: {
+		...mapGetters(["inviteData"])
+	},
 	data() {
 		return {
 			count: 30
@@ -40,10 +42,10 @@ export default {
 	methods: {
 		challengeAccepted: function() {
 			const payload = {
-				inviterID: this.inviter.id
+				to: this.inviteData.inviter.id,
+				roomID: this.inviteData.roomID
 			};
 			socket.emit("ACCEPT_BATTLE_INVITATION", payload);
-			this.$store.dispatch(user.actionTypes.UPDATE_STATUS);
 		},
 		decline: function() {
 			this.$store.dispatch(sidebar.actionTypes.RESET_IDLE);

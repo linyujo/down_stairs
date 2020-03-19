@@ -18,10 +18,10 @@
 			/>
 		</ul>
 		<div v-else-if="sidebarStatus === 'inviting'">
-			<Inviting :invitee="invitee" />
+			<Inviting />
 		</div>
 		<div v-else-if="sidebarStatus === 'invited'">
-			<Invited :inviter="inviter" />
+			<Invited />
 		</div>
 		<div v-else>
 			<div></div>
@@ -63,16 +63,12 @@ export default {
 			}
 		}
 	},
-	data() {
-		return {
-			invitee: null,
-			intiter: null
-		};
-	},
 	mounted() {
-		socket.on("RECEIVED_BATTLE_INVITATION", payload => {
-			this.inviter = payload.inviter;
-			this.$store.dispatch(sidebar.actionTypes.INVITED);
+		socket.on("BATTLE_INVITATION", payload => {
+			this.$store.dispatch(sidebar.actionTypes.INVITED, {
+				inviter: payload.from,
+				roomID: payload.roomID
+			});
 			this.$refs.onlineUserWrapper.style.boxShadow =
 				"box-shadow: 4px 10px 50px 10px rgba(255,255,255,1);";
 		});
@@ -92,12 +88,14 @@ export default {
 			radial-gradient(circle closest-corner at
 			${moveX}px
 			${moveY}px,
-			rgba(255,253,221,100) 0%, rgba(0,0,0,.1) 66%)`;
+			rgba(255,255,255,100) 0%, rgba(0,0,0,.1) 66%)`;
 		},
 		handleInvite: function(user) {
 			if (user.id === this.clientID) return;
-			this.invitee = user;
-			this.$store.dispatch(sidebar.actionTypes.INVITING);
+			if (user.status === "battling") return;
+			this.$store.dispatch(sidebar.actionTypes.INVITING, {
+				invitee: user
+			});
 		}
 	}
 };
@@ -113,6 +111,7 @@ export default {
 	border-top-left-radius: 30px;
 	box-shadow: 25px 6px 103px -27px rgba(0, 0, 0, 0.75);
 	overflow: hidden;
+	z-index: 10;
 	transition: all 0.2s;
 	&.highLighted {
 		box-shadow: -1px 1px 50px 10px rgba(255, 255, 255, 1);

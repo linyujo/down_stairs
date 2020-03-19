@@ -1,11 +1,17 @@
 const state = {
 	status: "idle",
-	title: "在線成員"
+	title: "在線成員",
+	inviteData: {
+		invitee: null, // 受邀人
+		inviter: null, // 發起人
+		roomID: ""
+	}
 };
 
 const getters = {
 	sidebarStatus: state => state.status,
-	sidebarTitle: state => state.title
+	sidebarTitle: state => state.title,
+	inviteData: state => state.inviteData
 };
 
 // constant
@@ -21,14 +27,22 @@ const mutations = {
 	[actionTypes.RESET_IDLE]: nextState => {
 		nextState.status = "idle";
 		nextState.title = "在線成員";
+		nextState.inviteData = {
+			invitee: null,
+			inviter: null,
+			roomID: ""
+		};
 	},
-	[actionTypes.INVITING]: nextState => {
+	[actionTypes.INVITING]: (nextState, payload) => {
 		nextState.status = "inviting";
 		nextState.title = "召喚中";
+		nextState.inviteData.invitee = payload.invitee;
 	},
-	[actionTypes.INVITED]: nextState => {
+	[actionTypes.INVITED]: (nextState, payload) => {
 		nextState.status = "invited";
 		nextState.title = "決鬥召喚";
+		nextState.inviteData.inviter = payload.inviter;
+		nextState.inviteData.roomID = payload.roomID;
 	},
 	[actionTypes.BATTLING]: nextState => {
 		nextState.status = "battling";
@@ -41,11 +55,11 @@ const actions = {
 	[actionTypes.RESET_IDLE]: ({ commit }) => {
 		commit(actionTypes.RESET_IDLE);
 	},
-	[actionTypes.INVITING]: ({ commit }) => {
-		commit(actionTypes.INVITING);
+	[actionTypes.INVITING]: ({ commit }, payload) => {
+		commit(actionTypes.INVITING, payload);
 	},
-	[actionTypes.INVITED]: ({ commit }) => {
-		commit(actionTypes.INVITED);
+	[actionTypes.INVITED]: ({ commit }, payload) => {
+		commit(actionTypes.INVITED, payload);
 	},
 	[actionTypes.BATTLING]: ({ commit }) => {
 		commit(actionTypes.BATTLING);

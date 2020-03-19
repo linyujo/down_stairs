@@ -57,6 +57,9 @@ export default {
 			}
 		}
 	},
+	beforeDestroy: function() {
+		socket.off("RESPONSE_USER_TOKEN");
+	},
 	methods: {
 		login: function() {
 			const { username } = this;

@@ -121,16 +121,13 @@ export default class DualGame {
 	}
 	willUnmount = () => {
 		this.isPlaying = false;
-		const { players, controlledPlayerID, roomID } = this;
+		const { players, controlledPlayerID } = this;
 		const myCharactor = players[controlledPlayerID - 1];
 		if (myCharactor.blood === 0) {
 			document.getElementById("looseText").click();
 		} else {
 			document.getElementById("winText").click();
 		}
-		socket.emit("GAME_END", {
-			roomID: roomID
-		});
 	}
 	renderStairCount = () => {
 		const { ctx, time } = this;

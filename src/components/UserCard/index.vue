@@ -14,7 +14,12 @@
 			</div>
 			<div class="avatar-mask"></div>
 		</div>
-		<div class="userName">{{ user.username }}</div>
+		<div class="user">
+			<div class="userName">{{ user.username }}</div>
+			<div :class="['userStatus', user.status]">
+				{{ user.status === "idle" ? "閒置中" : "決鬥中" }}
+			</div>
+		</div>
 	</li>
 </template>
 
@@ -68,7 +73,7 @@ li {
 .user-card {
 	display: flex;
 	align-items: center;
-	padding: 0 14px;
+	padding: 10px 8px;
 	margin-bottom: 8px;
 	border-radius: 6px;
 	cursor: pointer;
@@ -77,16 +82,16 @@ li {
 		background: radial-gradient(
 			circle,
 			rgba(255, 255, 255, 1) 0%,
-			rgba(255, 253, 221, 1) 66%
+			rgba(255, 253, 231, 1) 66%
 		);
-		box-shadow: 10px 10px 234px 64px rgba(255, 253, 221, 1);
+		box-shadow: 10px 10px 234px 64px rgba(255, 255, 255, 1);
 		.avatar-mask {
 			background: rgba(0, 0, 0, 0);
 		}
 	}
 }
 .avatar {
-	width: 70px;
+	width: 50px;
 	overflow: hidden;
 	border-radius: 6px;
 	.avatar-mask {
@@ -117,14 +122,26 @@ li {
 	padding-top: 100%;
 	position: relative;
 }
-.userName {
-	line-height: 70px;
+.user {
+	flex: 1;
 	margin-left: 16px;
-	font-size: 1.2rem;
 	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	width: 100%;
 	text-align: left;
+	.userName {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 1.2em;
+	}
+	.userStatus {
+		&.idle {
+			color: rgb(44, 171, 255);
+			font-size: 14px;
+			margin-top: 10px;
+		}
+		&.battling {
+			color: rgb(255, 70, 45);
+			font-weight: bold;
+		}
+	}
 }
 </style>

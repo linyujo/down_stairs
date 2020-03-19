@@ -2,7 +2,7 @@
 	<div class="invite">
 		<div v-if="step === 1">
 			召喚
-			<div class="username">{{ invitee.username }}</div>
+			<div class="username">{{ inviteData.invitee.username }}</div>
 			來一場激烈的決鬥嗎？
 			<div class="btn-gruop">
 				<button @click="sendInvitation" class="text-btn accept">
@@ -20,12 +20,15 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import socket from "@/socket";
 import sidebarStatus from "@/store/modules/sidebarStatus";
 import user from "@/store/modules/user";
 
 export default {
-	props: ["invitee", "setTitle"],
+	computed: {
+		...mapGetters(["inviteData"])
+	},
 	data() {
 		return {
 			step: 1,
@@ -36,7 +39,7 @@ export default {
 		step: function(value) {
 			if (value === 2) {
 				this.countDown();
-				this.onListenReply();
+				// this.onListenReply();
 			}
 		},
 		count: function(value) {
@@ -45,13 +48,16 @@ export default {
 			}
 		}
 	},
+	beforeDestroy: function() {
+		socket.off("ACCEPT_BATTLE_INVITATION");
+	},
 	methods: {
 		sendInvitation: function() {
 			this.step = 2;
 			const payload = {
-				inviteeID: this.invitee.id
+				to: this.inviteData.invitee.id
 			};
-			socket.emit("SEND_BATTLE_INVITATION", payload);
+			socket.emit("BATTLE_INVITATION", payload);
 		},
 		onListenReply: function() {
 			socket.on("ACCEPT_BATTLE_INVITATION", () => {

@@ -1,3 +1,5 @@
+import userStore from "@/store/modules/user";
+
 const state = {
 	list: []
 };
@@ -42,8 +44,11 @@ const actions = {
 	[actionTypes.DELETE_ONE_USER]: ({ commit }, id) => {
 		commit(actionTypes.DELETE_ONE_USER, id);
 	},
-	[actionTypes.UPDATE_ONE_USER]: ({ commit }, user) => {
+	[actionTypes.UPDATE_ONE_USER]: ({ commit, getters, dispatch }, user) => {
 		commit(actionTypes.UPDATE_ONE_USER, user);
+		if (user.id === getters.clientID) {
+			dispatch(userStore.actionTypes.UPDATE_STATUS);
+		}
 	}
 };
 

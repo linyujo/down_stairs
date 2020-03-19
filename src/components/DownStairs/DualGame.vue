@@ -84,13 +84,15 @@ class Canvas {
 			throw new Error("canvas is not created");
 		}
 		this.ctx = this.node.getContext("2d");
-		// ctxExpansion(this.ctx);
 		this.width = this.node.width = canvasWidth;
 		this.height = this.node.height = canvasHeight;
 
 		this.gameInfo();
 	};
 	start = () => {
+		window.addEventListener("keydown", this.handleKeyDown);
+		window.addEventListener("keyup", this.handleKeyUp);
+
 		// 遊戲
 		this.game = new Game({
 			ctx: this.ctx,
@@ -116,9 +118,11 @@ class Canvas {
 		this.game.render();
 
 		requestAnimationFrame(this.render);
-		// 滑鼠游標
-		// this.cursor();
 	};
+	unmount = () => {
+		window.removeEventListener("keydown", this.handleKeyDown);
+		window.removeEventListener("keyup", this.handleKeyUp)
+	}
 	gameInfo = () => {
 		const { ctx, width, height } = this;
 
@@ -145,43 +149,6 @@ class Canvas {
 			playerMotion.head.height,
 		);
 	}
-	cursor = () => {
-		const { position } = this.mouse;
-		this.ctx.fillStyle = "red";
-		this.ctx.beginPath();
-		this.ctx.drawCircle(position, 3);
-		this.ctx.fill();
-
-		this.ctx.save();
-		this.ctx.beginPath();
-
-		this.ctx.translate(position.x, position.y);
-		this.ctx.strokeStyle = "red";
-
-		this.ctx.fillText(position, 10, -10); // 靶心座標文字
-		const bullLength = 20; // 靶心長度
-		// 靶心X軸
-		this.ctx.drawLine(new Vec2D(-bullLength, 0), new Vec2D(bullLength, 0));
-		// 旋轉90, 靶心Y軸
-		this.ctx.rotate(Math.PI / 2);
-		this.ctx.drawLine(new Vec2D(-bullLength, 0), new Vec2D(bullLength, 0));
-		this.ctx.stroke();
-
-		this.ctx.restore();
-	};
-	handleMouseMove = evt => {
-		this.mouse.position.set(evt.offsetX, evt.offsetY);
-	};
-	handleMouseDown = evt => {
-		const { position } = this.mouse;
-		position.set(evt.offsetX, evt.offsetY);
-		this.mouse.posDown = position.clone();
-	};
-	handleMouseUp = evt => {
-		const { position } = this.mouse;
-		position.set(evt.offsetX, evt.offsetY);
-		this.mouse.posDown = position.clone();
-	};
 	handleKeyDown = evt => {
 		if (!this.game) {
 			return;
@@ -207,7 +174,7 @@ class Canvas {
 }
 
 export default {
-	props: ["resetRoomID"],
+	props: ["resetAllStatusToIdle", "roomID"],
 	computed: {
 		...mapGetters(["clientID"])
 	},
@@ -215,18 +182,12 @@ export default {
 		return {
 			isWin: false,
 			isLoose: false,
+			canvas: null
 		};
 	},
 	mounted: function() {
 		// 遊戲本體
 		this.canvas = new Canvas(this.$refs.playground);
-
-		window.addEventListener("keydown", evt => {
-			this.canvas.handleKeyDown(evt);
-		});
-		window.addEventListener("keyup", evt => {
-			this.canvas.handleKeyUp(evt);
-		});
 
 		socket.on("GAME_INIT_DATA", payload => {
 			payload.controlledPlayerID = payload.initPlayerConfigs.find(char => char.master === this.clientID).playerID;
@@ -247,14 +208,28 @@ export default {
 			this.canvas.game.updateRival(payload);
 		});
 	},
+	beforeDestroy: function(){
+		socket.off('GAME_INIT_DATA');
+		socket.off('GAME_START');
+		socket.off('NEW_STAIR_CONFIG');
+		socket.off('UPDATE_RIVAL');
+		this.canvas.unmount();
+		this.canvas = null;
+	},
 	methods: {
 		showWinText: function(){
 			this.isWin = true;
-			this.resetRoomID();
+			this.emitEndGame();
 		},
 		showLooseText: function(){
 			this.isLoose = true;
-			this.resetRoomID();
+			this.emitEndGame();
+		},
+		emitEndGame: function(){
+			socket.emit("GAME_END", {
+				roomID: this.roomID
+			});
+			this.resetAllStatusToIdle();
 		}
 	}
 };
