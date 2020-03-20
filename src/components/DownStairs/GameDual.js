@@ -259,8 +259,14 @@ export default class DualGame {
 		socket.emit("UPDATE_RIVAL", {
 			roomID: roomID,
 			playerID: controlledPlayerID,
-			position: myCharactor.position,
-			v: myCharactor.v,
+			position: {
+				x: myCharactor.position.x,
+				y: myCharactor.position.y
+			},
+			v: {
+				x: myCharactor.v.x,
+				y: myCharactor.v.y
+			},
 			direction: myCharactor.direction,
 			isRunning: myCharactor.isRunning,
 			isHurt: myCharactor.isHurt,
