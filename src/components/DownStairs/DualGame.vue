@@ -97,8 +97,8 @@ class Canvas {
 		this.gameInfo();
 	};
 	start = () => {
-		window.addEventListener("keydown", debounce(this.handleKeyDown, 100));
-		window.addEventListener("keyup", debounce(this.handleKeyUp, 100));
+		window.addEventListener("keydown", this.handleKeyDown);
+		window.addEventListener("keyup", this.handleKeyUp);
 		// 遊戲
 		this.game = new Game({
 			ctx: this.ctx,
