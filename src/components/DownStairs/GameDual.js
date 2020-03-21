@@ -307,7 +307,10 @@ export default class DualGame {
 	};
 	updateRival = payload => {
 		const { data } = payload;
-		this.rivalData.position = new Vec2D(data.position.x, data.position.y);
+		this.rivalData.position = new Vec2D(
+			data.position.x,
+			data.position.y + 30
+		);
 		this.rivalData.v = new Vec2D(data.v.x, data.v.y);
 		this.rivalData.blood = data.blood;
 		this.rivalData.direction = data.direction;
