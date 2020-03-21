@@ -55,3 +55,14 @@ export function playSound_Times(elementId, times) {
 
 	repeat();
 }
+
+export function debounce(func, wait) {
+	// 定時器變數
+	let timeout;
+	return function(evt) {
+		// 每次觸發 scroll handler 時先清除定時器
+		clearTimeout(timeout);
+		// 指定 xx ms 後觸發真正想進行的操作 handler
+		timeout = setTimeout(() => func(evt), wait);
+	};
+}

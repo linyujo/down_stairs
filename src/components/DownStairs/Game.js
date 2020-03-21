@@ -60,7 +60,6 @@ export default class Game {
 			right: false,
 			space: false // 暫停
 		};
-		this.controlledPlayerID = 1;
 		this.ctx = args.ctx;
 	}
 	willInit = () => {
@@ -201,7 +200,7 @@ export default class Game {
 		this.player = player;
 	};
 	updatePlayers = () => {
-		const { width, height, controlledPlayerID, keyStatus, player } = this;
+		const { width, height, keyStatus, player } = this;
 
 		player.update();
 		checkBorder(player);
@@ -211,9 +210,6 @@ export default class Game {
 		if (player.position.y > height + player.height) {
 			// 如果其中一個玩家掉出遊戲高度，血量歸零
 			player.blood = 0;
-		}
-		if (player.playerID !== controlledPlayerID) {
-			return;
 		}
 		// 如果左鍵按下，控制中的角色向左，並移動
 		if (keyStatus.left) {

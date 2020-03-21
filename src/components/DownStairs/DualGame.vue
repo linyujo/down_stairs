@@ -17,7 +17,6 @@
 			<span>YOU</span>
 			<span> LOOSE</span>
 		</div>
-		<!-- <div :class="['text_loose', isHidden ? 'hidden' : '']">YOU LOOSE</div> -->
 		<!-- 音訊 -->
 		<audio id="backgroundMusic" loop>
 			<source src="@/assets/audio/bgMusic.mp3" type="audio/mp3" />
@@ -46,6 +45,7 @@
 <script>
 import socket from "@/socket";
 import Vec2D from "@/utils/Vector2D";
+import { debounce } from "@/utils/utilFuncs";
 import Game from "./GameDual";
 import { PlayerOne, PlayerTwo } from "./MotionCanvas";
 import { mapGetters } from "vuex";
@@ -68,10 +68,14 @@ class Canvas {
 	game = null;
 	initConfigs = {
 		// socket傳來的初始設定
+		rivalID: "",
+		rivalCharacter: 1,
+		myCharacter: 2,
 		roomID: 0,
 		initStairConfigs: [],
 		initPlayerConfigs: []
 	};
+	counter;
 	constructor(node) {
 		this.node = node;
 	}
@@ -93,9 +97,8 @@ class Canvas {
 		this.gameInfo();
 	};
 	start = () => {
-		window.addEventListener("keydown", this.handleKeyDown);
-		window.addEventListener("keyup", this.handleKeyUp);
-
+		window.addEventListener("keydown", debounce(this.handleKeyDown, 100));
+		window.addEventListener("keyup", debounce(this.handleKeyUp, 100));
 		// 遊戲
 		this.game = new Game({
 			ctx: this.ctx,
@@ -103,7 +106,6 @@ class Canvas {
 			height: this.height,
 			...this.initConfigs
 		});
-
 		requestAnimationFrame(this.render);
 		setInterval(this.update, 1000 / this.updateFPS);
 		this.game.willInit();
@@ -123,14 +125,17 @@ class Canvas {
 		requestAnimationFrame(this.render);
 	};
 	unmount = () => {
-		window.removeEventListener("keydown", this.handleKeyDown);
-		window.removeEventListener("keyup", this.handleKeyUp);
+		window.removeEventListener(
+			"keydown",
+			debounce(this.handleKeyDown, 200)
+		);
+		window.removeEventListener("keyup", debounce(this.handleKeyUp, 200));
 	};
 	gameInfo = () => {
 		const { ctx, width, height } = this;
 
 		const playerMotion =
-			this.initConfigs.controlledPlayerID === 1 ? PlayerOne : PlayerTwo;
+			this.initConfigs.myCharacter === 1 ? PlayerOne : PlayerTwo;
 		const headPositionX = width / 2 - playerMotion.head.width / 2; // 中間 - 頭像寬
 		const headPositionY = height * 0.5;
 
@@ -158,10 +163,12 @@ class Canvas {
 			return;
 		}
 		if (evt.key === "ArrowLeft") {
-			this.game.keyStatus.left = true;
+			this.emitKeyStatus("LEFT_TRUE");
+			this.game.myKeyStatus.left = true;
 		}
 		if (evt.key === "ArrowRight") {
-			this.game.keyStatus.right = true;
+			this.emitKeyStatus("RIGHT_TRUE");
+			this.game.myKeyStatus.right = true;
 		}
 	};
 	handleKeyUp = evt => {
@@ -169,11 +176,19 @@ class Canvas {
 			return;
 		}
 		if (evt.key === "ArrowLeft") {
-			this.game.keyStatus.left = false;
+			this.emitKeyStatus("LEFT_FALSE");
+			this.game.myKeyStatus.left = false;
 		}
 		if (evt.key === "ArrowRight") {
-			this.game.keyStatus.right = false;
+			this.emitKeyStatus("RIGHT_FALSE");
+			this.game.myKeyStatus.right = false;
 		}
+	};
+	emitKeyStatus = action => {
+		socket.emit("UPDATE_RIVAL", {
+			to: this.initConfigs.rivalID,
+			action: action
+		});
 	};
 }
 
@@ -193,20 +208,18 @@ export default {
 		// 遊戲本體
 		this.canvas = new Canvas(this.$refs.playground);
 
-		socket.on("GAME_INIT_DATA", payload => {
-			let controlledPlayerID;
-			let rivalPlayerID;
-			payload.initPlayerConfigs.forEach(charactor => {
-				if (charactor.master === this.clientID) {
-					controlledPlayerID = charactor.playerID;
-				} else {
-					rivalPlayerID = charactor.playerID;
-				}
-			});
-			payload.controlledPlayerID = controlledPlayerID;
-			payload.rivalPlayerID = rivalPlayerID;
-			this.canvas.initConfigs = payload;
+		socket.on("RIVAL_INFO", rival => {
+			this.canvas.initConfigs.rivalID = rival.id;
+			this.canvas.initConfigs.rivalCharacter = rival.characterID;
+			this.canvas.initConfigs.myCharacter =
+				rival.characterID === 1 ? 2 : 1;
+		});
 
+		socket.on("GAME_INIT_DATA", payload => {
+			this.canvas.initConfigs.roomID = payload.roomID;
+			this.canvas.initConfigs.initStairConfigs = payload.initStairConfigs;
+			this.canvas.initConfigs.initPlayerConfigs =
+				payload.initPlayerConfigs;
 			this.canvas.init();
 		});
 
@@ -223,6 +236,7 @@ export default {
 		});
 	},
 	beforeDestroy: function() {
+		socket.off("RIVAL_INFO");
 		socket.off("GAME_INIT_DATA");
 		socket.off("GAME_START");
 		socket.off("NEW_STAIR_CONFIG");

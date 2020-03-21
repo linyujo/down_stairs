@@ -9,8 +9,8 @@ export default class Player {
 			height: 86,
 			position: new Vec2D(0, 0),
 			v: new Vec2D(0, 0),
-			a: new Vec2D(0, 0.8),
-			playerID: 1, // 幾號角色
+			a: new Vec2D(0, 0.6),
+			characterID: 1, // 幾號角色
 			playerMotion: null, // 角色動作
 			blood: 10, // 目前血量
 			maxBlood: 10, // 總血量
@@ -25,13 +25,12 @@ export default class Player {
 		Object.assign(this, this.config);
 	}
 	init = () => {
-		this.playerMotion = this.playerID === 1 ? PlayerOne : PlayerTwo;
+		this.playerMotion = this.characterID === 1 ? PlayerOne : PlayerTwo;
 	};
 	update = () => {
 		// 速度, 加速度 更新
 		this.position = this.position.add(this.v);
 		this.v = this.v.add(this.a);
-
 		if (this.position.y - this.height < 2) {
 			// 玩家碰到天花板
 			this.touchedRoof();
@@ -52,7 +51,7 @@ export default class Player {
 		if (this.direction) {
 			// 向右
 			if (isHurt) {
-				// 受傷
+				// 受傷0
 				this.hurtedRight(drawDirection);
 				return;
 			}
@@ -204,7 +203,7 @@ export default class Player {
 			blood,
 			maxBlood,
 			gameWidth,
-			playerID,
+			characterID,
 			playerMotion
 		} = this;
 
@@ -213,7 +212,7 @@ export default class Player {
 
 		// 血量條旁邊的頭像 = 1號玩家 距離左邊10px : 2號玩家 距離右邊10px
 		const headPositionX =
-			playerID === 1 ? 10 : gameWidth - (10 + headWidth);
+			characterID === 1 ? 10 : gameWidth - (10 + headWidth);
 
 		ctx.drawImage(
 			playerMotion.head,
@@ -229,7 +228,7 @@ export default class Player {
 
 		// 血量條 = 1號玩家 頭像的位置 + 60px : 2號玩家 頭像再往左185
 		const bloodPosition =
-			playerID === 1 ? headPositionX + 60 : headPositionX - 185;
+			characterID === 1 ? headPositionX + 60 : headPositionX - 185;
 
 		do_Times(maxBlood)(i => {
 			const color = i < blood ? "red" : "#848484";

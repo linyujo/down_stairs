@@ -33,6 +33,7 @@
 
 <script>
 import Vec2D from "@/utils/Vector2D";
+import { debounce } from "@/utils/utilFuncs";
 
 import Game from "./Game";
 
@@ -87,14 +88,14 @@ class Canvas {
 			width: this.width,
 			height: this.height
 		});
-		// this.game.init();
 
-		this.node.addEventListener("mousemove", this.handleMouseMove);
 		requestAnimationFrame(this.render);
 		setInterval(this.update, 1000 / this.updateFPS);
 	};
 	start = () => {
 		this.game.willInit();
+		window.addEventListener("keydown", debounce(this.handleKeyDown, 100));
+		window.addEventListener("keyup", debounce(this.handleKeyUp, 100));
 	};
 	update = () => {
 		// 遊戲
@@ -171,6 +172,10 @@ class Canvas {
 			this.game.keyStatus.right = false;
 		}
 	};
+	willDestroy = () => {
+		window.removeEventListener("keydown", this.handleKeyDown);
+		window.removeEventListener("keyup", this.handleKeyUp);
+	};
 }
 
 export default {
@@ -194,17 +199,9 @@ export default {
 		// 遊戲本體
 		this.canvas = new Canvas(this.$refs.playground);
 		this.canvas.init();
-
-		// 事件
-		// window.addEventListener("resize", () => {
-		// 	this.canvas.init();
-		// });
-		window.addEventListener("keydown", evt => {
-			this.canvas.handleKeyDown(evt);
-		});
-		window.addEventListener("keyup", evt => {
-			this.canvas.handleKeyUp(evt);
-		});
+	},
+	willDestroy: function() {
+		this.canvas.willDestroy();
 	}
 };
 </script>
