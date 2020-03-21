@@ -268,7 +268,7 @@ export default class DualGame {
 
 		function adjustRivalPosition(player, rivalPosition) {	
 			const distance = getDistance(player.position, rivalPosition);
-			if (distance > 5) {
+			if (distance > 1) {
 				// TweenMax.to(
 				// 	player,
 				// 	0.2,
