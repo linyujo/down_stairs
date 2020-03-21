@@ -271,13 +271,16 @@ export default class DualGame {
 			if (distance > 1) {
 				TweenMax.to(
 					player,
-					0.3,
+					0.2,
 					{
 						x: rivalPosition.x,
-						y: rivalPosition.y
+						y: rivalPosition.y,
+						position: new Vec2D(rivalPosition.x, rivalPosition.y)
 					}
 				);
-				player.position = rivalPosition;
+				// setTimeout(() => {
+				// 	player.position = rivalPosition;
+				// }, 200);	
 			}
 		}
 
