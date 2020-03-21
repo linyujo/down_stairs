@@ -227,16 +227,15 @@ export default class DualGame {
 		this.players.forEach(player => {
 			checkBorder(player); // 檢查玩家是否碰到遊戲邊界
 
-			// if (player.blood === 0) {
-			// 	this.willUnmount();
-			// }
+			if (player.blood === 0) {
+				this.willUnmount();
+			}
 			if (player.position.y > height + player.height) {
 				// 如果其中一個玩家掉出遊戲高度，血量歸零
 				player.blood = 0;
 			}
 
-			// player.update();
-			// 如果左鍵按下，控制中的角色向左，並移動
+			player.update();
 			if (player.characterID === myCharacter) {
 				movePlayer(myKeyStatus, player);
 				this.myPosition = player.position;
@@ -246,7 +245,7 @@ export default class DualGame {
 			}
 		});
 
-		// this.checkPlayerAndStairInteraction(); // 玩家與階梯互動
+		this.checkPlayerAndStairInteraction(); // 玩家與階梯互動
 
 		function movePlayer(keyStatus, player) {
 			// 如果左鍵按下，控制中的角色向右
@@ -272,17 +271,7 @@ export default class DualGame {
 			}
 			const distance = getDistance(player.position, rivalPosition);
 			if (distance > 1) {
-				TweenMax.to(
-					player,
-					1,
-					{
-						x: rivalPosition.x,
-						y: rivalPosition.y
-					}
-				);
-				setTimeout(() => {
-					player.position = rivalPosition;
-				}, 1000);	
+				player.position = rivalPosition;
 			}
 		}
 
