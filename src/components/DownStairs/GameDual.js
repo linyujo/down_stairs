@@ -274,7 +274,7 @@ export default class DualGame {
 			if (distance > 1) {
 				TweenMax.to(
 					player,
-					0.2,
+					1,
 					{
 						x: rivalPosition.x,
 						y: rivalPosition.y
@@ -282,7 +282,7 @@ export default class DualGame {
 				);
 				setTimeout(() => {
 					player.position = rivalPosition;
-				}, 200);	
+				}, 1000);	
 			}
 		}
 
