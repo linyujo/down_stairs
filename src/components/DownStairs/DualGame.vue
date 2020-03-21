@@ -97,8 +97,8 @@ class Canvas {
 		this.gameInfo();
 	};
 	start = () => {
-		window.addEventListener("keydown", this.handleKeyDown);
-		window.addEventListener("keyup", this.handleKeyUp);
+		window.addEventListener("keydown", debounce(this.handleKeyDown, 85));
+		window.addEventListener("keyup", debounce(this.handleKeyUp, 85));
 		// 遊戲
 		this.game = new Game({
 			ctx: this.ctx,
@@ -187,7 +187,8 @@ class Canvas {
 	emitKeyStatus = action => {
 		socket.emit("UPDATE_RIVAL", {
 			to: this.initConfigs.rivalID,
-			action: action
+			action: action,
+			position: this.game.myPosition
 		});
 	};
 }

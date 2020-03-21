@@ -42,3 +42,7 @@ export default class Vector2D {
 		return this.x === v.x && this.y === v.y;
 	}
 }
+
+export function getDistance(p1, p2) {
+	return p1.sub(p2).length;
+}

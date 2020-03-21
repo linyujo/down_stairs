@@ -1,8 +1,9 @@
 /* eslint-disable */
-import Vec2D from "@/utils/Vector2D";
+import Vec2D, { getDistance } from "@/utils/Vector2D";
 import Stair from "./Stair";
 import Player from "./Player";
 import { do_Times, playSound, stopSound } from "@/utils/utilFuncs";
+import Vector2D from "../../utils/Vector2D";
 
 function isPlayerOnAStair(stair, player) {
 	/*
@@ -44,6 +45,7 @@ export default class DualGame {
 			gameHeight: 540,
 			isPlaying: false,
 			time: 0,
+			myPosition: new Vec2D(0, 0),
 			myKeyStatus: {
 				left: false,
 				right: false
@@ -53,6 +55,7 @@ export default class DualGame {
 				left: false,
 				right: false
 			},
+			rivalPosition: new Vec2D(0, 0),
 			ctx: null,
 			// socket傳來的初始設定
 			rivalID: "",
@@ -236,8 +239,9 @@ export default class DualGame {
 			// 如果左鍵按下，控制中的角色向左，並移動
 			if (player.characterID === myCharacter) {
 				movePlayer(myKeyStatus, player);
+				this.myPosition = player.position;
 			} else {
-				// player.position.y += 30; // 對手高度 +30
+				adjustRivalPosition(player, this.rivalPosition);
 				movePlayer(rivalKeyStatus, player);
 			}
 		});
@@ -262,6 +266,20 @@ export default class DualGame {
 			}
 		}
 
+		function adjustRivalPosition(player, rivalPosition) {	
+			const distance = getDistance(player.position, rivalPosition);
+			if (distance > 5) {
+				TweenMax.to(
+					player,
+					0.2,
+					{
+						x: rivalPosition.x,
+						y: rivalPosition.y
+					}
+				);
+			}
+		}
+
 		function checkBorder(player) {
 			if (player.position.x - player.width / 2 < 0) {
 				// 檢查玩家是否超出左邊界
@@ -277,15 +295,31 @@ export default class DualGame {
 		switch (payload.action) {
 			case "LEFT_TRUE":
 				this.rivalKeyStatus.left = true;
+				this.rivalPosition = new Vec2D(
+					payload.position.x,
+					payload.position.y
+				);
 				break;
 			case "RIGHT_TRUE":
 				this.rivalKeyStatus.right = true;
+				this.rivalPosition = new Vec2D(
+					payload.position.x,
+					payload.position.y
+				);
 				break;
 			case "LEFT_FALSE":
 				this.rivalKeyStatus.left = false;
+				this.rivalPosition = new Vec2D(
+					payload.position.x,
+					payload.position.y
+				);
 				break;
 			case "RIGHT_FALSE":
 				this.rivalKeyStatus.right = false;
+				this.rivalPosition = new Vec2D(
+					payload.position.x,
+					payload.position.y
+				);
 				break;
 			default:
 				break;
@@ -300,7 +334,7 @@ export default class DualGame {
 		this.players.forEach(player => {
 			player.drawBlood();
 		});
-	};
+	}
 	checkPlayerAndStairInteraction = () => {
 		const { stairs, players } = this;
 
