@@ -266,7 +266,10 @@ export default class DualGame {
 			}
 		}
 
-		function adjustRivalPosition(player, rivalPosition) {	
+		function adjustRivalPosition(player, rivalPosition) {
+			if (rivalPosition.x === 0 && rivalPosition.y === 0) {
+				return;
+			}
 			const distance = getDistance(player.position, rivalPosition);
 			if (distance > 1) {
 				TweenMax.to(
