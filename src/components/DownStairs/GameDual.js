@@ -1,9 +1,8 @@
-/* eslint-disable */
-import Vec2D, { getDistance } from "@/utils/Vector2D";
+import socket from "@/socket";
+import Vec2D from "@/utils/Vector2D";
 import Stair from "./Stair";
 import Player from "./Player";
 import { do_Times, playSound, stopSound } from "@/utils/utilFuncs";
-import Vector2D from "../../utils/Vector2D";
 
 function isPlayerOnAStair(stair, player) {
 	/*
@@ -45,17 +44,18 @@ export default class DualGame {
 			gameHeight: 540,
 			isPlaying: false,
 			time: 0,
-			myPosition: new Vec2D(0, 0),
-			myKeyStatus: {
+			keyStatus: {
 				left: false,
 				right: false
 			},
-			// socket會傳來對手的key event
-			rivalKeyStatus: {
-				left: false,
-				right: false
+			rivalData: {
+				position: new Vec2D(0, 0),
+				v: new Vec2D(0, 0),
+				blood: 10,
+				direction: false,
+				isRunning: false,
+				isHurt: false
 			},
-			rivalPosition: new Vec2D(0, 0),
 			ctx: null,
 			// socket傳來的初始設定
 			rivalID: "",
@@ -189,7 +189,14 @@ export default class DualGame {
 		});
 	};
 	createPlayers = () => {
-		const { initPlayerConfigs, ctx, width } = this;
+		const {
+			initPlayerConfigs,
+			ctx,
+			width,
+			rivalCharacter,
+			rivalData
+		} = this;
+
 		const player1 = new Player({
 			characterID: initPlayerConfigs[0].characterID,
 			position: new Vec2D(
@@ -210,19 +217,19 @@ export default class DualGame {
 			gameWidth: width
 		});
 
+		if (player1.characterID === rivalCharacter) {
+			rivalData.position = player1.position;
+		} else {
+			rivalData.position = player2.position;
+		}
+
 		player1.init();
 		player2.init();
 
 		this.players = [player1, player2];
 	};
 	updatePlayers = () => {
-		const {
-			width,
-			height,
-			myCharacter,
-			myKeyStatus,
-			rivalKeyStatus
-		} = this;
+		const { width, height, myCharacter, keyStatus, rivalData } = this;
 
 		this.players.forEach(player => {
 			checkBorder(player); // 檢查玩家是否碰到遊戲邊界
@@ -235,17 +242,20 @@ export default class DualGame {
 				player.blood = 0;
 			}
 
-			player.update();
 			if (player.characterID === myCharacter) {
-				movePlayer(myKeyStatus, player);
-				this.myPosition = player.position;
+				player.update();
+				movePlayer(keyStatus, player);
+				this.checkPlayerAndStairInteraction(); // 玩家與階梯互動
+				this.emitMyPosition(player);
 			} else {
-				adjustRivalPosition(player, this.rivalPosition);
-				movePlayer(rivalKeyStatus, player);
+				player.position = rivalData.position;
+				player.v = rivalData.v;
+				player.blood = rivalData.blood;
+				player.direction = rivalData.direction;
+				player.isRunning = rivalData.isRunning;
+				player.isHurt = rivalData.isHurt;
 			}
 		});
-
-		this.checkPlayerAndStairInteraction(); // 玩家與階梯互動
 
 		function movePlayer(keyStatus, player) {
 			// 如果左鍵按下，控制中的角色向右
@@ -265,16 +275,6 @@ export default class DualGame {
 			}
 		}
 
-		function adjustRivalPosition(player, rivalPosition) {
-			if (rivalPosition.x === 0 && rivalPosition.y === 0) {
-				return;
-			}
-			const distance = getDistance(player.position, rivalPosition);
-			if (distance > 1) {
-				player.position = rivalPosition;
-			}
-		}
-
 		function checkBorder(player) {
 			if (player.position.x - player.width / 2 < 0) {
 				// 檢查玩家是否超出左邊界
@@ -286,39 +286,33 @@ export default class DualGame {
 			}
 		}
 	};
+	emitMyPosition = player => {
+		socket.emit("UPDATE_RIVAL", {
+			to: this.rivalID,
+			data: {
+				position: {
+					x: player.position.x,
+					y: player.position.y
+				},
+				v: {
+					x: player.v.x,
+					y: player.v.y
+				},
+				blood: player.blood,
+				direction: player.direction,
+				isRunning: player.isRunning,
+				isHurt: player.player
+			}
+		});
+	};
 	updateRival = payload => {
-		switch (payload.action) {
-			case "LEFT_TRUE":
-				this.rivalKeyStatus.left = true;
-				this.rivalPosition = new Vec2D(
-					payload.position.x,
-					payload.position.y
-				);
-				break;
-			case "RIGHT_TRUE":
-				this.rivalKeyStatus.right = true;
-				this.rivalPosition = new Vec2D(
-					payload.position.x,
-					payload.position.y
-				);
-				break;
-			case "LEFT_FALSE":
-				this.rivalKeyStatus.left = false;
-				this.rivalPosition = new Vec2D(
-					payload.position.x,
-					payload.position.y
-				);
-				break;
-			case "RIGHT_FALSE":
-				this.rivalKeyStatus.right = false;
-				this.rivalPosition = new Vec2D(
-					payload.position.x,
-					payload.position.y
-				);
-				break;
-			default:
-				break;
-		}
+		const { data } = payload;
+		this.rivalData.position = new Vec2D(data.position.x, data.position.y);
+		this.rivalData.v = new Vec2D(data.v.x, data.v.y);
+		this.rivalData.blood = data.blood;
+		this.rivalData.direction = data.direction;
+		this.rivalData.isRunning = data.isRunning;
+		this.rivalData.isHurt = data.isHurt;
 	};
 	renderPlayers = () => {
 		this.players.forEach(player => {
@@ -329,7 +323,7 @@ export default class DualGame {
 		this.players.forEach(player => {
 			player.drawBlood();
 		});
-	}
+	};
 	checkPlayerAndStairInteraction = () => {
 		const { stairs, players } = this;
 

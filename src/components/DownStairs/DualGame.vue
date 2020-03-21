@@ -45,7 +45,6 @@
 <script>
 import socket from "@/socket";
 import Vec2D from "@/utils/Vector2D";
-import { debounce } from "@/utils/utilFuncs";
 import Game from "./GameDual";
 import { PlayerOne, PlayerTwo } from "./MotionCanvas";
 import { mapGetters } from "vuex";
@@ -97,8 +96,8 @@ class Canvas {
 		this.gameInfo();
 	};
 	start = () => {
-		window.addEventListener("keydown", debounce(this.handleKeyDown, 85));
-		window.addEventListener("keyup", debounce(this.handleKeyUp, 85));
+		window.addEventListener("keydown", this.handleKeyDown);
+		window.addEventListener("keyup", this.handleKeyUp);
 		// 遊戲
 		this.game = new Game({
 			ctx: this.ctx,
@@ -125,11 +124,8 @@ class Canvas {
 		requestAnimationFrame(this.render);
 	};
 	unmount = () => {
-		window.removeEventListener(
-			"keydown",
-			debounce(this.handleKeyDown, 200)
-		);
-		window.removeEventListener("keyup", debounce(this.handleKeyUp, 200));
+		window.removeEventListener("keydown", this.handleKeyDown);
+		window.removeEventListener("keyup", this.handleKeyUp);
 	};
 	gameInfo = () => {
 		const { ctx, width, height } = this;
@@ -163,12 +159,10 @@ class Canvas {
 			return;
 		}
 		if (evt.key === "ArrowLeft") {
-			this.emitKeyStatus("LEFT_TRUE");
-			this.game.myKeyStatus.left = true;
+			this.game.keyStatus.left = true;
 		}
 		if (evt.key === "ArrowRight") {
-			this.emitKeyStatus("RIGHT_TRUE");
-			this.game.myKeyStatus.right = true;
+			this.game.keyStatus.right = true;
 		}
 	};
 	handleKeyUp = evt => {
@@ -176,20 +170,11 @@ class Canvas {
 			return;
 		}
 		if (evt.key === "ArrowLeft") {
-			this.emitKeyStatus("LEFT_FALSE");
-			this.game.myKeyStatus.left = false;
+			this.game.keyStatus.left = false;
 		}
 		if (evt.key === "ArrowRight") {
-			this.emitKeyStatus("RIGHT_FALSE");
-			this.game.myKeyStatus.right = false;
+			this.game.keyStatus.right = false;
 		}
-	};
-	emitKeyStatus = action => {
-		socket.emit("UPDATE_RIVAL", {
-			to: this.initConfigs.rivalID,
-			action: action,
-			position: this.game.myPosition
-		});
 	};
 }
 
