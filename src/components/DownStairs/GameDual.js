@@ -277,13 +277,12 @@ export default class DualGame {
 					0.2,
 					{
 						x: rivalPosition.x,
-						y: rivalPosition.y,
-						position: new Vec2D(rivalPosition.x, rivalPosition.y)
+						y: rivalPosition.y
 					}
 				);
-				// setTimeout(() => {
-				// 	player.position = rivalPosition;
-				// }, 200);	
+				setTimeout(() => {
+					player.position = rivalPosition;
+				}, 200);	
 			}
 		}
 
