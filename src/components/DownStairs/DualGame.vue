@@ -48,6 +48,7 @@ import Vec2D from "@/utils/Vector2D";
 import Game from "./GameDual";
 import { PlayerOne, PlayerTwo } from "./MotionCanvas";
 import { mapGetters } from "vuex";
+import { debounce } from "@/utils/utilFuncs";
 
 const canvasWidth = 800;
 const canvasHeight = 600;
@@ -96,8 +97,8 @@ class Canvas {
 		this.gameInfo();
 	};
 	start = () => {
-		window.addEventListener("keydown", this.handleKeyDown);
-		window.addEventListener("keyup", this.handleKeyUp);
+		window.addEventListener("keydown", debounce(this.handleKeyDown, 100));
+		window.addEventListener("keyup", debounce(this.handleKeyUp, 100));
 		// 遊戲
 		this.game = new Game({
 			ctx: this.ctx,
