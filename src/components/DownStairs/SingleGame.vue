@@ -175,6 +175,7 @@ class Canvas {
 	willDestroy = () => {
 		window.removeEventListener("keydown", this.handleKeyDown);
 		window.removeEventListener("keyup", this.handleKeyUp);
+		clearInterval(this.update);
 	};
 }
 
