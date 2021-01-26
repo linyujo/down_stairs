@@ -26,10 +26,13 @@ export default {
 	},
 	data() {
 		return {
-			count: 30
+			count: 29,
+			startingTime: 0,
+			lastCall: null
 		};
 	},
 	mounted() {
+		this.startingTime = new Date();
 		this.countDown();
 	},
 	watch: {
@@ -51,11 +54,25 @@ export default {
 			this.$store.dispatch(sidebar.actionTypes.RESET_IDLE);
 		},
 		countDown: function() {
-			if (this.count > 0) {
-				setTimeout(() => {
-					this.count -= 1;
+			// if (this.count > 0) {
+			// 	setTimeout(() => {
+			// 		this.count -= 1;
+			// 		this.countDown();
+			// 	}, 1000);
+			// }
+			const currentTime = new Date();
+			if (currentTime - this.startingTime > 29 * 1000) {
+				this.count = 0;
+				clearTimeout(this.lastCall);
+				return;
+			}
+			if (currentTime - this.startingTime < 29 * 1000) {
+				clearTimeout(this.lastCall);
+				this.lastCall = setTimeout(() => {
+					const secondsPassed = Math.floor(currentTime - this.startingTime / 1000);
+					this.count = 29 - secondsPassed;
 					this.countDown();
-				}, 1000);
+				}, 1000)
 			}
 		}
 	}
