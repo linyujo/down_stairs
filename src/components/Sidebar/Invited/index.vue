@@ -69,10 +69,12 @@ export default {
 			if (currentTime - this.startingTime < 29 * 1000) {
 				clearTimeout(this.lastCall);
 				this.lastCall = setTimeout(() => {
-					const secondsPassed = Math.floor(currentTime - this.startingTime / 1000);
+					const secondsPassed = Math.floor(
+						currentTime - this.startingTime / 1000
+					);
 					this.count = 29 - secondsPassed;
 					this.countDown();
-				}, 1000)
+				}, 1000);
 			}
 		}
 	}

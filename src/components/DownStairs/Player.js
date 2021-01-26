@@ -241,18 +241,21 @@ export default class Player {
 	};
 	bloodDelta = delta => {
 		const { blood, maxBlood } = this;
-		this.blood += delta;
+		if (delta > 0) {
+			this.blood += blood < maxBlood ? delta : 0;
+		}
 		if (delta < 0) {
 			// 扣血
+			this.blood += delta;
 			this.isHurt = true;
 			playSound("stabSound");
 			setTimeout(() => {
 				this.isHurt = false; // 300毫秒後，恢復成false，停止受傷動作
 			}, 300);
 		}
-		if (blood > maxBlood) {
-			this.blood = maxBlood;
-		}
+		// if (blood > maxBlood) {
+		// 	this.blood = maxBlood;
+		// }
 		if (blood < 0) {
 			this.blood = 0;
 			// 遊戲結束
