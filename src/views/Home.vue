@@ -196,6 +196,8 @@ export default {
 			img {
 				display: block;
 				margin-bottom: 16px;
+				width: 200px;
+				height: 200px;
 			}
 		}
 	}

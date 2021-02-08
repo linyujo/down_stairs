@@ -3,11 +3,19 @@
 		<canvas ref="playground" class="playground"></canvas>
 		<button
 			v-on:click="toggleGame"
-			:class="['startBtn', isHidden ? 'hidden' : '']"
+			:class="['gameBtn startBtn', isHidden ? 'hidden' : '']"
 			ref="startButton"
 			id="startButton"
 		>
 			Start
+		</button>
+		<button
+			v-on:click="exitGame"
+			:class="['gameBtn exitBtn', isHidden ? 'hidden' : '']"
+			ref="exitButton"
+			id="exitButton"
+		>
+			Exit
 		</button>
 		<!-- 音訊 -->
 		<audio id="backgroundMusic" loop>
@@ -193,6 +201,9 @@ export default {
 					this.canvas.start();
 					this.isHidden = true;
 				}
+			},
+			exitGame: () => {
+				this.$router.push("/");
 			}
 		};
 	},
@@ -217,11 +228,7 @@ export default {
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
-.startBtn {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+.gameBtn {
 	padding: 10px 70px;
 	background: rgba(white, 0.2);
 	color: white;
@@ -238,5 +245,19 @@ export default {
 	&.hidden {
 		display: none;
 	}
+}
+.startBtn {
+	position: absolute;
+	top: 42%;
+	left: 50%;
+	transform: translate(-50%, -42%);
+}
+.exitBtn {
+	position: absolute;
+	top: 60%;
+	left: 50%;
+	transform: translate(-50%, -60%);
+	padding-left: 95px;
+	padding-right: 95px;
 }
 </style>
