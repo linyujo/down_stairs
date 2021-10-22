@@ -28,6 +28,8 @@ export default class Player {
 		this.playerMotion = this.characterID === 1 ? PlayerOne : PlayerTwo;
 	};
 	update = () => {
+
+		this.isHurt = false; // 恢復無受傷狀態
 		// 速度, 加速度 更新
 		this.position = this.position.add(this.v);
 		this.v = this.v.add(this.a);
@@ -249,9 +251,10 @@ export default class Player {
 			this.blood += delta;
 			this.isHurt = true;
 			playSound("stabSound");
-			setTimeout(() => {
-				this.isHurt = false; // 300毫秒後，恢復成false，停止受傷動作
-			}, 300);
+
+			// setTimeout(() => {
+			// 	this.isHurt = false; // 300毫秒後，恢復成false，停止受傷動作
+			// }, 3000);
 		}
 		// if (blood > maxBlood) {
 		// 	this.blood = maxBlood;
