@@ -2,6 +2,8 @@ import Vec2D from "@/utils/Vector2D";
 import { do_Times, playSound } from "@/utils/utilFuncs";
 import { PlayerOne, PlayerTwo } from "./MotionCanvas";
 
+const INITIAL_RECOVER_COUTER = 30;
+
 export default class Player {
 	constructor(args) {
 		this.config = {
@@ -19,6 +21,7 @@ export default class Player {
 			direction: true, // 向右為true, 向左為false
 			isRunning: false, // 是否在跑步中
 			isHurt: false, // 是否扣血了
+			recoverCounter: INITIAL_RECOVER_COUTER,
 			gameWidth: 0,
 			...args
 		};
@@ -31,6 +34,12 @@ export default class Player {
 		// 速度, 加速度 更新
 		this.position = this.position.add(this.v);
 		this.v = this.v.add(this.a);
+
+		// 受傷復原
+		if (this.isHurt) {
+			this.recoverFromInjury();
+		}
+
 		if (this.position.y - this.height < 2) {
 			// 玩家碰到天花板
 			this.touchedRoof();
@@ -250,9 +259,9 @@ export default class Player {
 			this.isHurt = true;
 			playSound("stabSound");
 
-			setTimeout(() => {
-				this.isHurt = false; // 1000毫秒後，恢復成false，停止受傷動作
-			}, 1000);
+			// setTimeout(() => {
+			// 	this.isHurt = false; // 1000毫秒後，恢復成false，停止受傷動作
+			// }, 1000);
 		}
 		// if (blood > maxBlood) {
 		// 	this.blood = maxBlood;
@@ -262,6 +271,14 @@ export default class Player {
 			// 遊戲結束
 		}
 	};
+	recoverFromInjury = () => {
+		if (this.recoverCounter > 0) {
+			this.recoverCounter--;
+		} else {
+			this.isHurt = false;
+			this.recoverCounter = INITIAL_RECOVER_COUTER;
+		}
+	}
 	touchedRoof = () => {
 		if (!this.isTouchedRoof) {
 			this.isTouchedRoof = true; // 避免重複扣血
