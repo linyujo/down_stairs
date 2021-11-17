@@ -33,6 +33,7 @@ export default {
 		}
 	},
 	mounted() {
+		console.log("version 2.2.2");
 		socket.emit("REQUEST_CURRENT_USERS");
 		socket.on("RESPONSE_CURRENT_USERS", payload => {
 			this.$store.dispatch(
