@@ -33,7 +33,7 @@ export default {
 		}
 	},
 	mounted() {
-		localstorage.setitem(Version, "2.2.2")
+		localStorage.setItem("version", "2.2.2")
 		socket.emit("REQUEST_CURRENT_USERS");
 		socket.on("RESPONSE_CURRENT_USERS", payload => {
 			this.$store.dispatch(
