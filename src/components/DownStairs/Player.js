@@ -258,10 +258,6 @@ export default class Player {
 			this.blood += delta;
 			this.isHurt = true;
 			playSound("stabSound");
-
-			// setTimeout(() => {
-			// 	this.isHurt = false; // 1000毫秒後，恢復成false，停止受傷動作
-			// }, 1000);
 		}
 		// if (blood > maxBlood) {
 		// 	this.blood = maxBlood;
